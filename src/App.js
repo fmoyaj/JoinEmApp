@@ -1,5 +1,6 @@
 import './App.css';
 import React from 'react';
+import Popup from 'reactjs-popup';
 
 var MAX_EVENTS = 3;
 var MAX_COINEM_PER_EVENT = 5;
@@ -39,9 +40,35 @@ const Members = props => (
     <button className="simpleButton">
       Sort By
     </button>
-    <button className="simpleButton">
+    <button className="simpleButton" onClick={(e) => props.handleNewUser(e)}>
       Add Member
     </button>
+    <form>
+      <label>
+        Username:
+        <input type="text" 
+              name="username" 
+              value ={props.newMember.username} 
+              onChange={props.handleInputChange}>
+        </input>
+      </label>
+      <label>
+        Name:
+        <input type="text" 
+                name="name"
+                value ={props.newMember.name} 
+                onChange={props.handleInputChange}>
+        </input>
+      </label>
+      <label>
+        Last Name:
+        <input type="text" 
+                name="lastName"
+                value ={props.newMember.lastName} 
+                onChange={props.handleInputChange}>
+        </input>
+      </label>
+    </form>
   </div>
 
 )
@@ -53,9 +80,31 @@ class App extends React.Component{
     super(props)
     this.state = {
       members : [],
-
-
+      newMember : {username: '', name: '', lastName: '', coinem: MAX_COINEM, events: [],}
     }
+    this.handleInputChange = this.handleInputChange.bind(this);
+  }
+
+  handleInputChange(e){
+    const target = e.target;
+
+    switch(target.name){
+      case "username":
+        this.setState({newMember: {...this.state.newMember, username: e.target.value}});
+        break;
+      case "name":
+        this.setState({newMember: {...this.state.newMember, name: e.target.value}});
+        break;
+      case "lastName":
+        this.setState({newMember: {...this.state.newMember, lastName: e.target.value}});
+        break;
+    }
+  }
+
+
+
+  handleNewUser(){
+
   }
 
   render(){
@@ -66,7 +115,8 @@ class App extends React.Component{
           <button>Member</button>
         </header>
         <Globals></Globals>
-        <Members data={this.state.members}></Members>
+        <Members data={this.state.members} newMember={this.state.newMember} handleInputChange={this.handleInputChange}>
+        </Members>
       </div>
     );
   }
