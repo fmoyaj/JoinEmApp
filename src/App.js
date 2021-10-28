@@ -3,8 +3,48 @@ import React from 'react';
 
 var MAX_EVENTS = 3;
 var MAX_COINEM_PER_EVENT = 5;
-var MAX_COINEM = 5;
+var MAX_COINEM = 20;
 var NEXT_EVENT_UID = 1;
+
+const Globals = props => (
+  <div>
+    <span className="dashboardElem">
+      {MAX_EVENTS}<br/>
+      max events
+      <img src={"/icons/editing.png"}/>
+    </span>
+    <span className="dashboardElem">
+      {MAX_COINEM_PER_EVENT}<br/>
+      max coinem per event
+    </span>
+    <span className="dashboardElem">
+      {MAX_COINEM}<br/>
+      max coinem per user
+    </span>
+    <span className="dashboardElem">
+      {NEXT_EVENT_UID}<br/>
+      next event UID
+    </span>
+  </div>
+)
+
+const Members = props => (
+  <div>
+    <h3 className="inLineDivs">
+      Members
+    </h3>
+    <span className="inLineDivs">
+      {props.data.length}
+    </span>
+    <button className="simpleButton">
+      Sort By
+    </button>
+    <button className="simpleButton">
+      Add Member
+    </button>
+  </div>
+
+)
 
 
 
@@ -21,7 +61,12 @@ class App extends React.Component{
   render(){
     return (
       <div>
-        <header>Join'Em</header>
+        <header>Join'Em 
+          <button>Admin</button>
+          <button>Member</button>
+        </header>
+        <Globals></Globals>
+        <Members data={this.state.members}></Members>
       </div>
     );
   }

@@ -24,6 +24,34 @@
   color: white;
 }
 
+
+.dashboardElem{
+  padding: 20px;
+  color: black;
+  display: inline-flex;
+  flex-direction: row;
+}
+
+.inLineDivs{
+  padding: 10px;
+  color: black;
+  display: inline-flex;
+  flex-direction: row;
+}
+
+.simpleButton{
+  background-color: black;
+  color: white;
+}
+
+header{
+  width: 600 px;
+  justify-content: center;
+  color: white;
+  padding: 20px;
+  background-color: #282c34;
+}
+
 .App-link {
   color: #61dafb;
 }
