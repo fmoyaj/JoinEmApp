@@ -1,5 +1,8 @@
 import './App.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import React from 'react';
+import Table from 'react-bootstrap/Table';
+import Button from 'react-bootstrap/Button';
 
 var MAX_EVENTS = 3;
 var MAX_COINEM_PER_EVENT = 5;
@@ -69,6 +72,34 @@ const Members = props => (
       </label>
     </form>
     <button onClick={props.submit}>Add Member</button>
+    <Table striped border hover>
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th># of Events Planned</th>
+          <th>Coinem spent</th>
+          <th>Coinem pairs</th>
+        </tr>
+      </thead>
+      <tbody>
+        {props.data.map(member => (
+          <tr key={member.username}>
+            <td>{member.username}</td>
+            <td>{member.name}</td>
+            <td>{member.lastName}</td>
+            <td>{member.events.length}</td>
+            <td>{member.coinem}</td>
+            <td>Placeholder</td>
+            <td><Button variant="outline-secondary" size="sm" onClick={props.deleteMember(member.username)}>
+                  Delete
+                </Button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </Table>
   </div>
 
 )
@@ -83,6 +114,7 @@ class App extends React.Component{
     }
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleNewUser = this.handleNewUser.bind(this);
+    this.deleteMember = this.deleteMember.bind(this);
   }
 
   handleInputChange(e){
@@ -102,7 +134,19 @@ class App extends React.Component{
   }
 
   handleNewUser(){
-    this.setState({members: [...this.state.members, this.state.newMember], });
+    let memberToAdd = this.state.newMember;
+
+    // Checking that username is unique
+    if (!(this.state.members.map(m => m.username).includes(memberToAdd.username))){
+      this.setState({members: [...this.state.members, memberToAdd], 
+        newMember : {username: '', name: '', lastName: '', coinem: MAX_COINEM, events: []}, });
+    } else {
+      alert("Can't add member. Choose a unique username");
+    }
+  }
+
+  deleteMember(username){
+    console.log(username);
   }
 
   render(){
@@ -116,7 +160,8 @@ class App extends React.Component{
         <Members data={this.state.members} 
                   newMember={this.state.newMember} 
                   handleInputChange={this.handleInputChange}
-                  submit={this.handleNewUser}>
+                  submit={this.handleNewUser}
+                  deleteMember={this.deleteMember}>
         </Members>
       </div>
     );
