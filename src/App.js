@@ -1,6 +1,5 @@
 import './App.css';
 import React from 'react';
-import Popup from 'reactjs-popup';
 
 var MAX_EVENTS = 3;
 var MAX_COINEM_PER_EVENT = 5;
@@ -69,10 +68,10 @@ const Members = props => (
         </input>
       </label>
     </form>
+    <button onClick={props.submit}>Add Member</button>
   </div>
 
 )
-
 
 
 class App extends React.Component{
@@ -80,9 +79,10 @@ class App extends React.Component{
     super(props)
     this.state = {
       members : [],
-      newMember : {username: '', name: '', lastName: '', coinem: MAX_COINEM, events: [],}
+      newMember : {username: '', name: '', lastName: '', coinem: MAX_COINEM, events: []}
     }
     this.handleInputChange = this.handleInputChange.bind(this);
+    this.handleNewUser = this.handleNewUser.bind(this);
   }
 
   handleInputChange(e){
@@ -101,10 +101,8 @@ class App extends React.Component{
     }
   }
 
-
-
   handleNewUser(){
-
+    this.setState({members: [...this.state.members, this.state.newMember], });
   }
 
   render(){
@@ -115,7 +113,10 @@ class App extends React.Component{
           <button>Member</button>
         </header>
         <Globals></Globals>
-        <Members data={this.state.members} newMember={this.state.newMember} handleInputChange={this.handleInputChange}>
+        <Members data={this.state.members} 
+                  newMember={this.state.newMember} 
+                  handleInputChange={this.handleInputChange}
+                  submit={this.handleNewUser}>
         </Members>
       </div>
     );
