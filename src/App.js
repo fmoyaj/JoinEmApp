@@ -3,29 +3,25 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import React from 'react';
 import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
-
-var MAX_EVENTS = 3;
-var MAX_COINEM_PER_EVENT = 5;
-var MAX_COINEM = 20;
-var NEXT_EVENT_UID = 1;
+import Card from 'react-bootstrap/Card';
 
 const Globals = props => (
   <div>
     <span className="dashboardElem">
-      {MAX_EVENTS}<br/>
+      {props.maxEvents}<br/>
       max events
       <img src={"/icons/editing.png"}/>
     </span>
     <span className="dashboardElem">
-      {MAX_COINEM_PER_EVENT}<br/>
+      {props.maxCoinemEvent}<br/>
       max coinem per event
     </span>
     <span className="dashboardElem">
-      {MAX_COINEM}<br/>
+      {props.maxCoinem}<br/>
       max coinem per user
     </span>
     <span className="dashboardElem">
-      {NEXT_EVENT_UID}<br/>
+      {props.nextUID}<br/>
       next event UID
     </span>
   </div>
@@ -42,7 +38,7 @@ const Members = props => (
     <button className="simpleButton">
       Sort By
     </button>
-    <button className="simpleButton" onClick={(e) => props.handleNewUser(e)}>
+    <button className="simpleButton" onClick={props.handleNewUser}>
       Add Member
     </button>
     <form>
@@ -89,10 +85,10 @@ const Members = props => (
             <td>{member.username}</td>
             <td>{member.name}</td>
             <td>{member.lastName}</td>
-            <td>{member.events.length}</td>
+            <td>Placeholder</td>
             <td>{member.coinem}</td>
             <td>Placeholder</td>
-            <td><Button variant="outline-secondary" size="sm" onClick={props.deleteMember(member.username)}>
+            <td><Button variant="outline-secondary" size="sm" onClick={() => props.deleteMember(member.username)}>
                   Delete
                 </Button>
             </td>
@@ -104,14 +100,31 @@ const Members = props => (
 
 )
 
+const Events = props => (
+  <div>
+    <h3>Events</h3>
+    <span className="inLineDivs">
+      {props.data.length}
+    </span>
+    <button className="simpleButton">
+      Sort By
+    </button>
+    
+  </div> 
+)
+
 
 class App extends React.Component{
   constructor(props){
     super(props)
     this.state = {
+      MAX_EVENTS: 3,
+      MAX_COINEM_PER_EVENT: 5,
+      MAX_COINEM: 20,
+      NEXT_EVENT_UID: 1,
       members : [],
-      newMember : {username: '', name: '', lastName: '', coinem: MAX_COINEM, events: []}
-    }
+      newMember : {username: '', name: '', lastName: '', coinem: 0,}
+    } 
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleNewUser = this.handleNewUser.bind(this);
     this.deleteMember = this.deleteMember.bind(this);
@@ -139,14 +152,15 @@ class App extends React.Component{
     // Checking that username is unique
     if (!(this.state.members.map(m => m.username).includes(memberToAdd.username))){
       this.setState({members: [...this.state.members, memberToAdd], 
-        newMember : {username: '', name: '', lastName: '', coinem: MAX_COINEM, events: []}, });
+        newMember : {username: '', name: '', lastName: '', coinem: 0, }});
     } else {
       alert("Can't add member. Choose a unique username");
     }
   }
 
   deleteMember(username){
-    console.log(username);
+    //console.log(username)
+    this.setState({members: this.state.members.filter(m => m.username !== username)});
   }
 
   render(){
@@ -156,13 +170,20 @@ class App extends React.Component{
           <button>Admin</button>
           <button>Member</button>
         </header>
-        <Globals></Globals>
+        <Globals maxEvents={this.state.MAX_EVENTS}
+                maxCoinem={this.state.MAX_COINEM}
+                maxCoinemEvent={this.state.MAX_COINEM_PER_EVENT}
+                nextUID ={this.state.NEXT_EVENT_UID}
+                >
+        </Globals>
         <Members data={this.state.members} 
                   newMember={this.state.newMember} 
                   handleInputChange={this.handleInputChange}
                   submit={this.handleNewUser}
                   deleteMember={this.deleteMember}>
         </Members>
+        {//<Events data={this.state.members.map(m => m.events)}></Events>
+  }
       </div>
     );
   }
