@@ -4,25 +4,29 @@ import React from 'react';
 import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
+import editing from './icons/editing.png';
 
 const Globals = props => (
   <div>
     <span className="dashboardElem">
       {props.maxEvents}<br/>
       max events
-      <img src={"/icons/editing.png"}/>
+      <img src={editing} width="16" height="16"/>
     </span>
     <span className="dashboardElem">
       {props.maxCoinemEvent}<br/>
       max coinem per event
+      <img src={editing} width="16" height="16"/>
     </span>
     <span className="dashboardElem">
       {props.maxCoinem}<br/>
       max coinem per user
+      <img src={editing} width="16" height="16"/>
     </span>
     <span className="dashboardElem">
       {props.nextUID}<br/>
       next event UID
+      <img src={editing} width="16" height="16"/>
     </span>
   </div>
 )
@@ -75,6 +79,7 @@ const Members = props => (
           <th>First Name</th>
           <th>Last Name</th>
           <th># of Events Planned</th>
+          <th>Events</th>
           <th>Coinem spent</th>
           <th>Coinem pairs</th>
         </tr>
@@ -86,7 +91,8 @@ const Members = props => (
             <td>{member.name}</td>
             <td>{member.lastName}</td>
             <td>Placeholder</td>
-            <td>{member.coinem}</td>
+            <td>Placeholder</td>
+            <td>Placeholder</td>
             <td>Placeholder</td>
             <td><Button variant="outline-secondary" size="sm" onClick={() => props.deleteMember(member.username)}>
                   Delete
@@ -102,7 +108,7 @@ const Members = props => (
 
 const Events = props => (
   <div>
-    <h3>Events</h3>
+    <h3 className="inLineDivs">Events</h3>
     <span className="inLineDivs">
       {props.data.length}
     </span>
@@ -122,8 +128,29 @@ class App extends React.Component{
       MAX_COINEM_PER_EVENT: 5,
       MAX_COINEM: 20,
       NEXT_EVENT_UID: 1,
-      members : [],
-      newMember : {username: '', name: '', lastName: '', coinem: 0,}
+      members : [{username: "alexaa", 
+      name: "Alex", 
+      lastName: "Aardvark", 
+      coinem: {
+         "1": 3, 
+         "6": 5,
+         "11": 4,  
+         "14": 2
+       }
+     }, ],
+      newMember : {username: '', name: '', lastName: '', coinem: 0,},
+      events: [
+        {"uid": 1, 
+         "title": "Introductory Glass Blowing",
+         "description" : "Let's gather a group for an intro glass blowing class at Diablo Glass in Boston. Aiming for a Tue/Wed night in November.", 
+         "planner": "gigi"
+         },
+  
+        {"uid": 2, 
+         "title": "Whale Watching",
+         "description" : "Organizing a weekend whale watching group from Gloucester via Cape Ann Whale Watch (https://www.seethewhales.com/).", 
+         "planner": "finz"
+         },],
     } 
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleNewUser = this.handleNewUser.bind(this);
@@ -164,6 +191,7 @@ class App extends React.Component{
   }
 
   render(){
+    console.log(this.state.members);
     return (
       <div>
         <header>Join'Em 
@@ -176,14 +204,15 @@ class App extends React.Component{
                 nextUID ={this.state.NEXT_EVENT_UID}
                 >
         </Globals>
+        <ErrorBoundary>
         <Members data={this.state.members} 
                   newMember={this.state.newMember} 
                   handleInputChange={this.handleInputChange}
                   submit={this.handleNewUser}
                   deleteMember={this.deleteMember}>
         </Members>
-        {//<Events data={this.state.members.map(m => m.events)}></Events>
-  }
+        </ErrorBoundary>
+        <Events data={this.state.events}></Events>
       </div>
     );
   }
