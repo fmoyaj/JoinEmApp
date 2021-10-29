@@ -3,8 +3,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import React from 'react';
 import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
-import Card from 'react-bootstrap/Card';
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
+import Popover from 'react-bootstrap/Popover';
 import editing from './icons/editing.png';
+import coinem from './icons/coinem_icon.png'
 
 
 const inputData = {
@@ -291,7 +293,20 @@ const Members = props => (
 
 )
 
-const Events = props => (
+const EventPopover = props => (
+  <Popover id="popover-basic">
+    <Popover.Header as="h3">{props.membersInterested + " members interested:"}</Popover.Header>
+    <Popover.Body>
+      {props.message}
+    </Popover.Body>
+  </Popover>
+);
+
+function Events (props) {
+  let membersCoinem = props.members.map(member => [member.username, member.coinem]);
+
+
+  return(
   <div>
     <h3 className="inLineDivs">Events</h3>
     <span className="inLineDivs">
@@ -300,10 +315,32 @@ const Events = props => (
     <button className="simpleButton">
       Sort By
     </button>
-    
-  </div> 
-)
+    {props.data.map(event => (
+      <div class="card">
+        <h5 class="card-header">{event.uid.toString() + " " + event.title}</h5>
+        <div class="card-body">
+          <h5 class="card-title">{event.planner}</h5>
+          <p class="card-text">{event.description}</p>
+        </div>
+        <div class="card-body">
+          {
+            <div>
+            <EventPopover message={membersCoinem.map(m => [m.username, m.coinem]).filter(m => Object.keys(m[1]).includes(event.uid.toString())).map(m => [m[0], m[1][event.uid]]).join(',')} membersInterested={5}></EventPopover>
+            {/* <OverlayTrigger trigger="click" placement="right" overlay={<EventPopover message={'hello'} membersInterested={5}></EventPopover>}>
+                <Button variant="success">Click me to see</Button>
+           </OverlayTrigger>
+            <EventPopover message={'hello'} membersInterested={5}></EventPopover> 
 
+            .includes(event.uid)).map(m=> [m[0], m[1]]).join(',')*/}
+            </div>
+          }
+        </div>
+      </div>
+    ))}
+  </div> )
+  }
+
+// <img src={coinem} width="16" height="16"></img>
 
 class App extends React.Component{
   constructor(props){
@@ -376,7 +413,7 @@ class App extends React.Component{
                   deleteMember={this.deleteMember}>
         </Members>
         </ErrorBoundary>
-        <Events data={this.state.events}></Events>
+        <Events data={this.state.events} members={this.state.members}></Events>
       </div>
     );
   }
