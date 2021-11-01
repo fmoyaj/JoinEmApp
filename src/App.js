@@ -362,6 +362,7 @@ class App extends React.Component{
       events: inputData.events,
       fileDownloadUrl: null,
       fileInfo: "",
+      currentUser: "admin", // Stores if interface is in admin mode or member mode
     } 
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleNewUser = this.handleNewUser.bind(this);
@@ -451,7 +452,8 @@ class App extends React.Component{
   }
 
   becomeMember(name){
-    console.log(name);
+    this.setState({currentUser: name});
+    console.log(this.state.currentUser);
   }
 
 
@@ -469,6 +471,7 @@ class App extends React.Component{
                   Members
                 </Dropdown.Toggle>
                 <Dropdown.Menu style={{ maxHeight: "200px", overflowY: "auto"}}>
+                  <Dropdown.Item onClick={()=> this.becomeMember("admin")}>Admin</Dropdown.Item>
                   {this.state.members.map(m =>
                     <Dropdown.Item eventKey={m.username} onClick={()=> this.becomeMember(m.username)}>{m.username}</Dropdown.Item>
                     )}
@@ -505,6 +508,9 @@ class App extends React.Component{
                 deleteEvent={this.deleteEvent}>
 
         </Events>
+        {this.state.currentUser === "admin" &&
+          <div>Current user: admin</div>
+        }
       </div>
     );
   }
