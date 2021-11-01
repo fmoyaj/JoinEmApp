@@ -5,9 +5,14 @@ import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Popover from 'react-bootstrap/Popover';
-import Tooltip from 'react-bootstrap/Tooltip';
+import { Navbar } from 'react-bootstrap';
+import { Container } from 'react-bootstrap';
+import {Dropdown} from 'react-bootstrap';
+import DropdownToggle from '@restart/ui/esm/DropdownToggle';
+import { Nav } from 'react-bootstrap';
 import editing from './icons/editing.png';
 import coinem from './icons/coinem_icon.png'
+import { DropdownButton } from 'react-bootstrap';
 
 
 const inputData = {
@@ -355,11 +360,16 @@ class App extends React.Component{
       members : inputData.members,
       newMember : {username: '', name: '', lastname: '', coinem: 0,},
       events: inputData.events,
+      fileDownloadUrl: null,
+      fileInfo: "",
     } 
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleNewUser = this.handleNewUser.bind(this);
     this.deleteMember = this.deleteMember.bind(this);
     this.deleteEvent= this.deleteEvent.bind(this);
+    this.downloadHandler = this.downloadHandler.bind(this);
+    //this.uploadHandler = this.uploadHandler.bind(this);
+    //this.openFileHandler = this.openFileHandler.bind(this);
   }
 
   handleInputChange(e){
@@ -408,13 +418,69 @@ class App extends React.Component{
     console.log(this.state.members);
   }
 
+  downloadHandler (event) {
+    event.preventDefault(); // Prevent default actions of event                   
+    // Prepare the file  
+    let output = JSON.stringify({MAX_EVENTS: this.state.MAX_EVENTS, 
+      MAX_COINEM_PER_EVENT: this.state.MAX_COINEM_PER_EVENT, 
+      MAX_COINEM: this.state.MAX_COINEM,
+      NEXT_EVENT_UID: this.state.NEXT_EVENT_UID,
+      members: this.state.members,
+      events: this.state.events,
+    }, null, 4);
+    console.log(output);
+    // Download it            
+    const blob = new Blob([output]);
+    const fileDownloadUrl = URL.createObjectURL(blob);
+    this.setState ({fileDownloadUrl: fileDownloadUrl},
+      // setState takes a callback function as an optional 2nd argument.          
+      // It is called only after the state has been updated.                       
+      () => {
+        this.domFileDownload.click();
+        URL.revokeObjectURL(fileDownloadUrl);  // free up storage--no longer needed.       
+        this.setState({fileDownloadUrl: ""})
+    })
+  }
+
+
+  uploadHandler(event) {
+    event.preventDefault();
+    this.domFileUpload.click() // This will browse for a file to upload 
+                               // and then call the openFileHandler from 
+                               // the input component's onChange handler.      
+  }
+
+
   render(){
     return (
       <div>
-        <header>Join'Em 
-          <button>Admin</button>
-          <button>Member</button>
-        </header>
+        <Navbar variant="dark" bg="dark" expand="lg">
+        <Container fluid>
+          <Navbar.Brand>Join'Em</Navbar.Brand>
+          <Navbar.Toggle aria-controls="navbar-dark-example" />
+          <Navbar.Collapse id="navbar-dark-example">
+            <Nav>
+              <Dropdown>
+                <Dropdown.Toggle>
+                  Members
+                </Dropdown.Toggle>
+                <Dropdown.Menu style={{ maxHeight: "200px", overflowY: "auto"}}>
+                  {this.state.members.map(m =>
+                    <Dropdown.Item eventKey={m.username}>{m.username}</Dropdown.Item>
+                    )}
+                </Dropdown.Menu>
+            </Dropdown>
+            </Nav>
+          </Navbar.Collapse>
+        </Container>
+      </Navbar>
+
+        <div>
+          <ErrorBoundary>
+          <button onClick={this.downloadHandler}>Download file</button>
+          </ErrorBoundary>
+          <Button onClick={this.uploadHandler}>Upload file</Button>
+        </div>
         <Globals maxEvents={this.state.MAX_EVENTS}
                 maxCoinem={this.state.MAX_COINEM}
                 maxCoinemEvent={this.state.MAX_COINEM_PER_EVENT}

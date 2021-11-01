@@ -13,6 +13,11 @@
   }
 }
 
+.dropdown-menu [aria-labelledby = ddown]{         
+  max-height: 200px;
+  overflow-y: auto;
+}
+
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
@@ -40,8 +45,6 @@
 .child{
   margin-left: "auto";
 }
-
-
 
 
 .dashboardElem{
@@ -74,6 +77,7 @@ header{
 .App-link {
   color: #61dafb;
 }
+
 
 @keyframes App-logo-spin {
   from {
