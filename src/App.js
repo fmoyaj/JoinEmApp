@@ -321,7 +321,8 @@ function Events (props) {
         <div class="card-body">
           <h5 class="card-title">{event.planner}</h5>
           <p class="card-text">{event.description}</p>
-           <EventPopover message={props.members.map(m => [m.username, m.coinem]).filter(m => (Object.keys(m[1]).includes((event.uid).toString()))).map(m => [m[0], m[1][event.uid]]).join('\n')} membersInterested={5}></EventPopover>
+           <EventPopover message={props.members.map(m => [m.username, m.coinem]).filter(m => (Object.keys(m[1]).includes((event.uid).toString()))).map(m => [m[0], m[1][event.uid]]).join('\n')} 
+                          membersInterested={props.members.map(m => [m.username, m.coinem]).filter(m => (Object.keys(m[1]).includes((event.uid).toString()))).length}></EventPopover>
         </div>
       </div>
     ))}
