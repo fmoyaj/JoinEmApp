@@ -5,6 +5,7 @@ import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Popover from 'react-bootstrap/Popover';
+import Tooltip from 'react-bootstrap/Tooltip';
 import editing from './icons/editing.png';
 import coinem from './icons/coinem_icon.png'
 
@@ -302,9 +303,9 @@ const EventPopover = props => (
   </Popover>
 );
 
+
 function Events (props) {
   let membersCoinem = props.members.map(member => [member.username, member.coinem]);
-
 
   return(
   <div>
@@ -317,19 +318,31 @@ function Events (props) {
     </button>
     {props.data.map(event => (
       <div class="card">
-        <h5 class="card-header">{event.uid.toString() + " " + event.title}</h5>
+        <h5 class="card-header" style={{ display: 'flex'}}>
+          {event.uid.toString() + ". " + event.title}
+          <Button variant="outline-secondary" size="sm" 
+                  style={{ marginLeft: "auto" }}
+                  onClick={() => props.deleteEvent(event.uid)}>
+                    Delete
+          </Button>
+        </h5>
         <div class="card-body">
           <h5 class="card-title">{event.planner}</h5>
           <p class="card-text">{event.description}</p>
-           <EventPopover message={props.members.map(m => [m.username, m.coinem]).filter(m => (Object.keys(m[1]).includes((event.uid).toString()))).map(m => [m[0], m[1][event.uid]]).join('\n')} 
-                          membersInterested={props.members.map(m => [m.username, m.coinem]).filter(m => (Object.keys(m[1]).includes((event.uid).toString()))).length}></EventPopover>
+              <OverlayTrigger trigger="hover" placement="top" overlay={<Popover className="popover" >
+                {"Members interested: " + membersCoinem.filter(m => (Object.keys(m[1]).includes((event.uid).toString()))).length +  ('\n\n(') + 
+                membersCoinem.filter(m => (Object.keys(m[1]).includes((event.uid).toString()))).map(m => [m[0], m[1][event.uid]]).join('\n') + (')' + 
+                "\nTotal coinem: " + membersCoinem.filter(m => (Object.keys(m[1]).includes((event.uid).toString()))).map(m => m[1][event.uid]).reduce((n,sum) => n+sum, 0))
+                }
+                </Popover>}>
+              <Button variant="light"><img src={coinem} className="icons"/></Button>
+              </OverlayTrigger>
         </div>
       </div>
     ))}
   </div> )
   }
 
-// <img src={coinem} width="16" height="16"></img>
 
 class App extends React.Component{
   constructor(props){
@@ -346,6 +359,7 @@ class App extends React.Component{
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleNewUser = this.handleNewUser.bind(this);
     this.deleteMember = this.deleteMember.bind(this);
+    this.deleteEvent= this.deleteEvent.bind(this);
   }
 
   handleInputChange(e){
@@ -380,6 +394,18 @@ class App extends React.Component{
     this.setState({members: this.state.members.filter(m => m.username !== username)});
   }
 
+  deleteEvent(uid){
+    this.setState({events: this.state.events.filter(e => e.uid !== uid),
+                    members: this.state.members.map(m => {return {...m, coinem: Object.keys(m.coinem).filter(key =>
+                      key !== uid.toString()).reduce((obj, key) =>
+                      {
+                          obj[key] = m.coinem[key];
+                          return obj;
+                      }, {}
+                  )}})});
+    console.log(this.state.members);
+  }
+
   render(){
     return (
       <div>
@@ -402,7 +428,11 @@ class App extends React.Component{
                   deleteMember={this.deleteMember}>
         </Members>
         </ErrorBoundary>
-        <Events data={this.state.events} members={this.state.members}></Events>
+        <Events data={this.state.events} 
+                members={this.state.members}
+                deleteEvent={this.deleteEvent}>
+
+        </Events>
       </div>
     );
   }

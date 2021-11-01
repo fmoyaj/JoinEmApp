@@ -24,6 +24,25 @@
   color: white;
 }
 
+.icons{
+  width:16px;
+  height:16px;
+}
+
+.popover {
+  white-space: pre-line;    
+}
+
+.parent{
+  display: 'flex';
+}
+
+.child{
+  margin-left: "auto";
+}
+
+
+
 
 .dashboardElem{
   padding: 20px;
