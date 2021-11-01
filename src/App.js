@@ -450,6 +450,10 @@ class App extends React.Component{
                                // the input component's onChange handler.      
   }
 
+  becomeMember(name){
+    console.log(name);
+  }
+
 
   render(){
     return (
@@ -466,7 +470,7 @@ class App extends React.Component{
                 </Dropdown.Toggle>
                 <Dropdown.Menu style={{ maxHeight: "200px", overflowY: "auto"}}>
                   {this.state.members.map(m =>
-                    <Dropdown.Item eventKey={m.username}>{m.username}</Dropdown.Item>
+                    <Dropdown.Item eventKey={m.username} onClick={()=> this.becomeMember(m.username)}>{m.username}</Dropdown.Item>
                     )}
                 </Dropdown.Menu>
             </Dropdown>
