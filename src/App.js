@@ -321,19 +321,7 @@ function Events (props) {
         <div class="card-body">
           <h5 class="card-title">{event.planner}</h5>
           <p class="card-text">{event.description}</p>
-        </div>
-        <div class="card-body">
-          {
-            <div>
-            <EventPopover message={membersCoinem.map(m => [m.username, m.coinem]).filter(m => Object.keys(m[1]).includes(event.uid.toString())).map(m => [m[0], m[1][event.uid]]).join(',')} membersInterested={5}></EventPopover>
-            {/* <OverlayTrigger trigger="click" placement="right" overlay={<EventPopover message={'hello'} membersInterested={5}></EventPopover>}>
-                <Button variant="success">Click me to see</Button>
-           </OverlayTrigger>
-            <EventPopover message={'hello'} membersInterested={5}></EventPopover> 
-
-            .includes(event.uid)).map(m=> [m[0], m[1]]).join(',')*/}
-            </div>
-          }
+           <EventPopover message={props.members.map(m => [m.username, m.coinem]).filter(m => (Object.keys(m[1]).includes((event.uid).toString()))).map(m => [m[0], m[1][event.uid]]).join('\n')} membersInterested={5}></EventPopover>
         </div>
       </div>
     ))}
