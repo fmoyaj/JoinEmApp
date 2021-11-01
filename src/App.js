@@ -199,6 +199,7 @@ const inputData = {
     ]
 }
 
+/* Admin components */
 const Globals = props => (
   <div>
     <span className="dashboardElem">
@@ -348,6 +349,22 @@ function Events (props) {
   </div> )
   }
 
+/* Member components */
+function Stats(props) {
+  let member = props.members.filter(m => m.username === props.user)[0];
+  console.log(props.maxCoinem);
+  return(
+  <div>
+    <span className="dashboardElem">
+      {props.maxEvents-props.events.filter(e => e.planner === props.user).length}<br/>
+      out of {props.maxEvents} events left
+    </span>
+    <span className="dashboardElem">
+      {props.maxCoinem-Object.values(member.coinem).reduce((n,sum) => n+sum, 0)}<br/>
+      out of {props.maxCoinem} coinem left
+    </span>
+  </div>)}
+
 
 class App extends React.Component{
   constructor(props){
@@ -471,7 +488,7 @@ class App extends React.Component{
                   Members
                 </Dropdown.Toggle>
                 <Dropdown.Menu style={{ maxHeight: "200px", overflowY: "auto"}}>
-                  <Dropdown.Item onClick={()=> this.becomeMember("admin")}>Admin</Dropdown.Item>
+                  <Dropdown.Item onClick={()=> this.becomeMember("admin")}>admin</Dropdown.Item>
                   {this.state.members.map(m =>
                     <Dropdown.Item eventKey={m.username} onClick={()=> this.becomeMember(m.username)}>{m.username}</Dropdown.Item>
                     )}
@@ -508,8 +525,13 @@ class App extends React.Component{
                 deleteEvent={this.deleteEvent}>
 
         </Events>
-        {this.state.currentUser === "admin" &&
-          <div>Current user: admin</div>
+        {this.state.currentUser !== "admin" &&
+          <Stats members={this.state.members}
+                  events={this.state.events} 
+                  user={this.state.currentUser} 
+                  maxEvents={this.state.MAX_EVENTS} 
+                  maxCoinem={this.state.MAX_COINEM}>
+          </Stats>
         }
       </div>
     );
