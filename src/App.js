@@ -391,7 +391,9 @@ class App extends React.Component{
   }
 
   deleteMember(username){
-    this.setState({members: this.state.members.filter(m => m.username !== username)});
+    this.setState({members: this.state.members.filter(m => m.username !== username),
+                  events: this.state.events.filter(e => e.planner !== username)});
+
   }
 
   deleteEvent(uid){
