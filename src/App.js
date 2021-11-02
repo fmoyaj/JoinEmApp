@@ -13,214 +13,78 @@ import { Nav } from 'react-bootstrap';
 import editing from './icons/editing.png';
 import coinem from './icons/coinem_icon.png'
 import { DropdownButton } from 'react-bootstrap';
-
-
-const inputData = {
-  "MAX_EVENTS": 3, 
-  "MAX_COINEM_PER_EVENT": 5, 
-  "MAX_COINEM": 20, 
-  "NEXT_EVENT_UID": 13, 
-
-  "members":
-    [
-      {"username": "alexaa", 
-       "firstname": "Alex", 
-       "lastname": "Aardvark", 
-       "coinem": {
-          "1": 3, 
-          "6": 5,
-          "11": 4,  
-          "14": 2
-        }
-      }, 
-      {"username": "fisher", 
-       "firstname": "Bailey", 
-       "lastname": "Bass", 
-       "coinem": {                     
-          "1": 5,
-          "7": 1, 
-          "8": 2, 
-          "10": 3
-        }
-      }, 
-      {"username": "ccamel", 
-       "firstname": "Cameron", 
-       "lastname": "Camel", 
-       "coinem": {
-          "2": 5,
-          "5": 3, 
-          "8": 3, 
-          "10": 1, 
-          "13": 5, 
-          "14": 3
-        }
-      }, 
-      {"username": "dyland", 
-       "firstname": "Dylan", 
-       "lastname": "Deer", 
-       "coinem": {
-          "1": 1,
-          "2": 1, 
-          "6": 3, 
-          "7": 4, 
-          "9": 3, 
-          "11": 1, 
-          "13": 3
-        }
-      }, 
-      {"username": "emerm", 
-       "firstname": "Emerson", 
-       "lastname": "Ermine", 
-       "coinem": {
-          "1": 1,
-          "3": 3,
-          "5": 3, 
-          "7": 1, 
-          "9": 2, 
-          "13": 3
-        }
-      }, 
-      {"username": "finz", 
-       "firstname": "Finley", 
-       "lastname": "Flounder", 
-       "coinem": {
-          "1": 1,
-          "3": 2, 
-          "4": 3, 
-          "5": 2, 
-          "8": 1, 
-          "10": 3, 
-          "14": 3
-        }
-      }, 
-      {"username": "gigi", 
-       "firstname": "Greer", 
-       "lastname": "Gecko", 
-       "coinem": {
-          "2": 1,
-          "5": 2, 
-          "6": 3, 
-          "8": 1, 
-          "10": 3, 
-          "11": 5, 
-          "14": 2
-        }
-      }, 
-      {"username": "flyer", 
-       "firstname": "Hayden", 
-       "lastname": "Hawk", 
-       "coinem": {
-          "2": 1,
-          "3": 1,
-          "6": 3, 
-          "7": 1, 
-          "8": 3, 
-          "10": 3, 
-          "11": 1, 
-          "14": 5
-        }
-      } 
-     ], 
- 
-  "events": 
-    [
-      {"uid": 1, 
-       "title": "Introductory Glass Blowing",
-       "description" : "Let's gather a group for an intro glass blowing class at Diablo Glass in Boston. Aiming for a Tue/Wed night in November.", 
-       "planner": "gigi"
-       },
-
-      {"uid": 2, 
-       "title": "Whale Watching",
-       "description" : "Organizing a weekend whale watching group from Gloucester via Cape Ann Whale Watch (https://www.seethewhales.com/).", 
-       "planner": "finz"
-       },
-      {"uid": 3, 
-       "title": "Disc golf at Borderlands", 
-       "description" : "Have you ever played disc golf? It's a fun activity for newbies and there's a nice course a Borderlands. Parts of Knives Out were filmed in the mansion there! Looking to form a foursome.",
-       "planner": "dyland"
-       },
-      {"uid": 4, 
-       "title": "Passion for Pumpkins!",
-       "description" : "I love carving jack-o-lanterns and would like to teach my craft to others. This is is a fun event with Halloween around the corner. Plus we'll raost the pumpkin seeds and eat them.", 
-       "planner": "alexaa"
-       },
-      {"uid": 5, 
-       "title": "Blue Hills Hike", 
-       "description" : "Fall is a fantastic time for a hike! The Fall colors in the Blue Hils are amazing. I'm planning a hike of the Skyline Trail on Saturday, November 6. Join me!", 
-       "planner": "flyer"
-       },
-      {"uid": 6, 
-       "title": "Forest Edibles",
-       "description" : "Squirrels aren't the only ones finding food in the forest. I'll show you lots of things that people can eat in the forest. After all the rain this summer, mushrooms are everywhere! I'm leading a trip in the Noanet Woodlands on Sun Oct. 31.", 
-       "planner": "emerm" 
-       },
-      {"uid": 7, 
-       "title": "Beginning Knitting", 
-       "description" : "Fall and Winter are a great time to learn knitting. I'll show you the basics, including how to cast on, knit, purl, and bind off. Classes will run Thursdays@7pm Nov 3 through Dec 8, except Thanksgiving (Nov 25).",
-       "planner": "alexaa"
-       },
-      {"uid": 8, 
-       "title": "Apple Picking and Pies",
-       "description" : "Fall is apple picking time! Tangerini Farm in Medway has a great orchard. After picking, let's make apple pie and tarte tartin (my favorite). Let's figure out a good time for this.", 
-       "planner": "alexaa"
-       },
-      {"uid": 9, 
-       "title": "Baker Estate?",
-       "description" : "I've been reading about the history of the Baker Estate in Wellesley and want to learn more, including exploring the ruins of the old estate. Anyone want to join me?", 
-       "planner": "fisher"
-       },
-      {"uid": 10, 
-       "title": "Minuteman Bike Trail",
-       "description" : "I'm planning a bike trip on the Minuteman Bike Trail from Lincoln Center to Davis Square and back. Tenatively for Sat. Oct. 30. Care to join me?", 
-       "planner": "dyland"
-       },
-      {"uid": 11, 
-       "title": "Chocolate Tasting?",
-       "description" : "I hear Taza Chocolate in Somerville has a great tour and chocolate tasting. I'd like to organize a group to do this. Who's interested?", 
-       "planner": "finz" 
-       },
-      {"uid": 12, 
-       "title": "Whist Group!",
-       "description" : "I'm looking to organize a group to play whist at a regular weekly time. Anyone interest in this?", 
-       "planner": "emerm"
-       },
-      {"uid": 13, 
-       "title": "BSO Tchaikovsky/Dvořák Nov 4-6",
-       "description" : "The Boston Symphony Orchestra has a Tchaikovsky/Dvořák weekend Nov 4-6 featuring pianist Beatrice Rana and conductor Dima Slobodeniouk. I'd love to go, but don't want to go alone. Who wants to go with me? What date is best for you?",
-       "planner": "gigi"
-      },
-      {"uid": 14, 
-       "title": "Algorithmic Inequality Reading Group",
-       "description" : "I'm organizing a reading group on algorithmic inequality. Books will include Noble's \"Algorithms of Oppression\", Eubanks's \"Automating Inequality\", and O'Neils's \"Weapons of Math Destruction\". Join me! Are there other books we should add to the list?",
-       "planner": "dyland"
-       }
-
-    ]
-}
+import { Modal } from 'react-bootstrap';
+import { useState } from 'react';
 
 /* Admin components */
+function EditGlobals(props) {
+  const [show, setShow] = useState(false);
+  const [currentValue, setCurrentValue] = useState("");
+
+  const handleClose = () => { 
+                              setShow(false);
+                              setCurrentValue("");
+                            };
+  const handleOpen = () => setShow(true);
+  const updateValue = (e) => setCurrentValue(e.target.value);
+
+  return (
+    <>
+      <Button variant="primary" onClick={handleOpen}>
+            <img src={editing} width="16" height="16"/> Press me
+            </Button>
+
+      <Modal show={show} onHide={handleClose}>
+        <Modal.Header>
+          <Modal.Title>{"Edit " + props.title}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <label>
+          {props.title + ":"}
+          <input type="text" 
+                  name={props.title}
+                  value ={currentValue}
+                  onChange={updateValue}>
+          </input>
+        </label>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Cancel
+          </Button>
+          <Button variant="primary" onClick={() => {props.handleSaveChanges(currentValue, props.title); handleClose()}}>
+            Save Changes
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </>
+  );
+}
+
+
+
+
+
 const Globals = props => (
   <div>
     <span className="dashboardElem">
       {props.maxEvents}<br/>
       max events
-      <img src={editing} width="16" height="16"/>
+      <EditGlobals title={"Max Events"} handleSaveChanges={props.handleSaveChanges}></EditGlobals>
     </span>
     <span className="dashboardElem">
       {props.maxCoinemEvent}<br/>
       max coinem per event
-      <img src={editing} width="16" height="16"/>
+      <EditGlobals title="Max Coinem Per Event" handleSaveChanges={props.handleSaveChanges}></EditGlobals>
     </span>
     <span className="dashboardElem">
       {props.maxCoinem}<br/>
       max coinem per user
-      <img src={editing} width="16" height="16"/>
+      <EditGlobals title="Max Coinem Per User" handleSaveChanges={props.handleSaveChanges}></EditGlobals>
     </span>
     <span className="dashboardElem">
       {props.nextUID}<br/>
       next event UID
-      <img src={editing} width="16" height="16"/>
     </span>
   </div>
 )
@@ -349,6 +213,10 @@ function Events (props) {
   </div> )
   }
 
+
+
+
+
 /* Member components */
 function Stats(props) {
   let member = props.members.filter(m => m.username === props.user)[0];
@@ -376,20 +244,23 @@ class App extends React.Component{
       MAX_COINEM_PER_EVENT: 5,
       MAX_COINEM: 20,
       NEXT_EVENT_UID: 1,
-      members : inputData.members,
+      members : [],
       newMember : {username: '', name: '', lastname: '', coinem: 0,},
-      events: inputData.events,
+      events: [],
       fileDownloadUrl: null,
       fileInfo: "",
       currentUser: "admin", // Stores if interface is in admin mode or member mode
+      show: false,
+      tempGlobalInfo: "",
     } 
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleNewUser = this.handleNewUser.bind(this);
     this.deleteMember = this.deleteMember.bind(this);
     this.deleteEvent= this.deleteEvent.bind(this);
     this.downloadHandler = this.downloadHandler.bind(this);
-    //this.uploadHandler = this.uploadHandler.bind(this);
-    //this.openFileHandler = this.openFileHandler.bind(this);
+    this.uploadHandler = this.uploadHandler.bind(this);
+    this.openFileHandler = this.openFileHandler.bind(this);
+    this.handleSaveChanges = this.handleSaveChanges.bind(this);
   }
 
   handleInputChange(e){
@@ -462,6 +333,32 @@ class App extends React.Component{
     })
   }
 
+  // handleCancel(){
+  //   this.setState({show: false})
+  // }
+
+  handleSaveChanges(newGlobalValue, nameGlobal){
+    switch(nameGlobal){
+      case "Max Events":
+        this.setState({MAX_EVENTS: newGlobalValue});
+        break;
+      case "Max Coinem Per Event":
+        this.setState({MAX_COINEM_PER_EVENT: newGlobalValue});
+        break;
+      case "Max Coinem Per User":
+        this.setState({MAX_COINEM: newGlobalValue});
+        break;
+    }
+  }
+
+  // updateMaxEvents(e){
+  //   this.setState({tempGlobalInfo: e.target.value})
+  // }
+
+  // handleOpen(){
+  //   this.setState({show: true, tempGlobalInfo: "",})
+  // }
+  
 
   uploadHandler(event) {
     event.preventDefault();
@@ -469,6 +366,37 @@ class App extends React.Component{
                                // and then call the openFileHandler from 
                                // the input component's onChange handler.      
   }
+
+  /**  
+   * Process the uploaded file within the React app.
+   */
+   openFileHandler(event) {
+    let fileInfoList = []; // Status output 
+    const fileObj = event.target.files[0]; // From automated .click() on file input component
+    const reader = new FileReader();
+
+    let fileLoadedHandler = e => {
+      // e.target.result is the file's content as text 
+      const fileContents = e.target.result;
+      fileInfoList.push(`File name: "${fileObj.name}". Length: ${fileContents.length} bytes.`);
+      fileInfoList.push (`File contents: ${fileContents}`)
+      const jsonData = JSON.parse(fileContents);
+      const jsonMembersData = jsonData.members
+      const jsonEventsData = jsonData.events
+      const jsonMAX_EVENTS = jsonData.MAX_EVENTS;
+      const jsonMAX_COINEM_PER_EVENT = jsonData.MAX_COINEM_PER_EVENT;
+      const jsonMAX_COINEM = jsonData.MAX_COINEM;
+      const jsonNEXT_UID = jsonData.NEXT_EVENT_UID;
+      this.setState ({fileInfo: fileInfoList.join("\n")});
+      this.setState ({members: jsonMembersData, events: jsonEventsData, MAX_EVENTS: jsonMAX_EVENTS, MAX_COINEM: jsonMAX_COINEM,
+        MAX_COINEM_PER_EVENT: jsonMAX_COINEM_PER_EVENT,  NEXT_EVENT_UID: jsonNEXT_UID});
+    }
+
+    // Mainline of the method 
+    fileLoadedHandler= fileLoadedHandler.bind(this);
+    reader.onload = fileLoadedHandler;
+    reader.readAsText(fileObj);
+}
 
   becomeMember(name){
     this.setState({currentUser: name});
@@ -511,6 +439,7 @@ class App extends React.Component{
                 maxCoinem={this.state.MAX_COINEM}
                 maxCoinemEvent={this.state.MAX_COINEM_PER_EVENT}
                 nextUID ={this.state.NEXT_EVENT_UID}
+                handleSaveChanges={this.handleSaveChanges}
                 >
         </Globals>
         <ErrorBoundary>
@@ -535,6 +464,34 @@ class App extends React.Component{
                   maxCoinem={this.state.MAX_COINEM}>
           </Stats>
         }
+
+      {/* <Button variant="primary" onClick={this.handleOpen}>
+              Launch demo modal
+            </Button>
+
+      <Modal show={this.state.show} onHide={this.handleCancel}>
+        <Modal.Header>
+          <Modal.Title>Modal heading</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <label>
+          Max events:
+          <input type="text" 
+                  name="Amount"
+                  value ={this.state.tempGlobalInfo} 
+                  onChange={this.updateMaxEvents}>
+          </input>
+        </label>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={this.handleCancel}>
+            Cancel
+          </Button>
+          <Button variant="primary" onClick={this.handleSaveChanges}>
+            Save Changes
+          </Button>
+        </Modal.Footer>
+      </Modal> */}
       
       <input type="file"
             className="hidden"                                                                   
@@ -549,7 +506,7 @@ class App extends React.Component{
             }
           />
         
-           <input type="file"
+           {/* <input type="file"
             className="hidden"                                                                   
             multiple={false}
             accept=".json, application/json" // Only upload JSON files                              
@@ -560,7 +517,7 @@ class App extends React.Component{
               // See https://reactjs.org/docs/refs-and-the-dom.html 
               domElt => this.domFileUpload = domElt
             }
-          />
+          /> */}
 
           <a className="hidden" 
             download="joinemData.json" // download attribute specifies file name                                        // to download to when clicking link 
