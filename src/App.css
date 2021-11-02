@@ -29,6 +29,10 @@
   color: white;
 }
 
+.hidden {
+  display: none;
+}
+
 .icons{
   width:16px;
   height:16px;

@@ -341,7 +341,7 @@ function Events (props) {
                 "\nTotal coinem: " + membersCoinem.filter(m => (Object.keys(m[1]).includes((event.uid).toString()))).map(m => m[1][event.uid]).reduce((n,sum) => n+sum, 0))
                 }
                 </Popover>}>
-              <Button variant="light"><img src={coinem} className="icons"/></Button>
+              <Button variant="light"><img src={coinem} className="icons"/>{" " + membersCoinem.filter(m => (Object.keys(m[1]).includes((event.uid).toString()))).map(m => m[1][event.uid]).reduce((n,sum) => n+sum, 0)}</Button>
               </OverlayTrigger>
         </div>
       </div>
@@ -364,6 +364,8 @@ function Stats(props) {
       out of {props.maxCoinem} coinem left
     </span>
   </div>)}
+
+
 
 
 class App extends React.Component{
@@ -533,6 +535,44 @@ class App extends React.Component{
                   maxCoinem={this.state.MAX_COINEM}>
           </Stats>
         }
+      
+      <input type="file"
+            className="hidden"                                                                   
+            multiple={false}
+            accept=".json, application/json" // Only upload JSON files                              
+            onChange={evt => this.openFileHandler(evt)}
+            ref={
+              // This is so-called "callback ref" that captures the associated
+              // DOM element on rendering.
+              // See https://reactjs.org/docs/refs-and-the-dom.html 
+              domElt => this.domFileUpload = domElt
+            }
+          />
+        
+           <input type="file"
+            className="hidden"                                                                   
+            multiple={false}
+            accept=".json, application/json" // Only upload JSON files                              
+            onChange={evt => this.openFileHandler(evt)}
+            ref={
+              // This is so-called "callback ref" that captures the associated
+              // DOM element on rendering.
+              // See https://reactjs.org/docs/refs-and-the-dom.html 
+              domElt => this.domFileUpload = domElt
+            }
+          />
+
+          <a className="hidden" 
+            download="joinemData.json" // download attribute specifies file name                                        // to download to when clicking link 
+             href={this.state.fileDownloadUrl}
+             ref={
+              // This is so-called "callback ref" that captures the associated 
+              // DOM element on rendering.
+              // See https://reactjs.org/docs/refs-and-the-dom.html
+              domElt => this.domFileDownload = domElt
+            }
+          >download it</a>
+        <pre className="status" className="hidden">{this.state.fileInfo}</pre>
       </div>
     );
   }
