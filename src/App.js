@@ -13,6 +13,7 @@ import { Nav } from 'react-bootstrap';
 import editing from './icons/editing.png';
 import coinem from './icons/coinem_icon.png'
 import { DropdownButton } from 'react-bootstrap';
+import { useState } from 'react';
 
 
 const inputData = {
@@ -388,8 +389,8 @@ class App extends React.Component{
     this.deleteMember = this.deleteMember.bind(this);
     this.deleteEvent= this.deleteEvent.bind(this);
     this.downloadHandler = this.downloadHandler.bind(this);
-    //this.uploadHandler = this.uploadHandler.bind(this);
-    //this.openFileHandler = this.openFileHandler.bind(this);
+    this.uploadHandler = this.uploadHandler.bind(this);
+    this.openFileHandler = this.openFileHandler.bind(this);
   }
 
   handleInputChange(e){
@@ -469,6 +470,28 @@ class App extends React.Component{
                                // and then call the openFileHandler from 
                                // the input component's onChange handler.      
   }
+
+  openFileHandler(event) {
+    let fileInfoList = []; // Status output 
+    const fileObj = event.target.files[0]; // From automated .click() on file input component
+    const reader = new FileReader();
+
+    let fileLoadedHandler = e => {
+      // e.target.result is the file's content as text 
+      const fileContents = e.target.result;
+      fileInfoList.push(`File name: "${fileObj.name}". Length: ${fileContents.length} bytes.`);
+      fileInfoList.push (`File contents: ${fileContents}`)
+      const jsonData = JSON.parse(fileContents);
+      const jsonJoinEmData = jsonData.restaurants
+      this.setState ({fileInfo: fileInfoList.join("\n")});
+      this.setState ({data: jsonRestaurantData});
+    }
+
+    // Mainline of the method 
+    fileLoadedHandler= fileLoadedHandler.bind(this);
+    reader.onload = fileLoadedHandler;
+    reader.readAsText(fileObj);
+}
 
   becomeMember(name){
     this.setState({currentUser: name});
