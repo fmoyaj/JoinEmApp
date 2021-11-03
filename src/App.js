@@ -6,35 +6,38 @@ import Button from 'react-bootstrap/Button';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Popover from 'react-bootstrap/Popover';
 import { Navbar } from 'react-bootstrap';
-import { Container } from 'react-bootstrap';
+import { Container, Alert } from 'react-bootstrap';
 import {Dropdown} from 'react-bootstrap';
-import DropdownToggle from '@restart/ui/esm/DropdownToggle';
 import { Nav } from 'react-bootstrap';
 import editing from './icons/editing.png';
 import coinem from './icons/coinem_icon.png'
-import { DropdownButton } from 'react-bootstrap';
-<<<<<<< HEAD
-=======
 import { Modal } from 'react-bootstrap';
->>>>>>> a22d4c77cfb19d2aef6da87487cb84b689baf4f5
 import { useState } from 'react';
 
 /* Admin components */
 function EditGlobals(props) {
   const [show, setShow] = useState(false);
   const [currentValue, setCurrentValue] = useState("");
+  const countOccurrences = (arr, val) => arr.reduce((a, v) => (v === val ? a + 1 : a), 0);
+  let maxValue = Math.max(...props.list.map(elem => countOccurrences(props.list, elem)));
 
-  const handleClose = () => { 
-                              setShow(false);
-                              setCurrentValue("");
-                            };
+  function handleClose() {
+    setShow(false);
+    setCurrentValue("");
+  }
+  function handleSubmit() {
+    if(currentValue > maxValue){
+      setShow(false);
+      setCurrentValue("");
+    }
+  }
   const handleOpen = () => setShow(true);
   const updateValue = (e) => setCurrentValue(e.target.value);
 
   return (
     <>
-      <Button variant="primary" onClick={handleOpen}>
-            <img src={editing} width="16" height="16"/> Press me
+      <Button variant="light" onClick={handleOpen}>
+            <img src={editing} width="16" height="16"/>
             </Button>
 
       <Modal show={show} onHide={handleClose}>
@@ -49,13 +52,19 @@ function EditGlobals(props) {
                   value ={currentValue}
                   onChange={updateValue}>
           </input>
+          {(currentValue < maxValue& currentValue !== "") &&
+              <Alert key="alert" variant="danger">
+              Invalid value for {props.title.toLowerCase()}. Submit a minimum value of {maxValue}.
+            </Alert>
+          
+          }
         </label>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>
             Cancel
           </Button>
-          <Button variant="primary" onClick={() => {props.handleSaveChanges(currentValue, props.title); handleClose()}}>
+          <Button variant="primary" onClick={() => {props.handleSaveChanges(currentValue, props.title, maxValue); handleSubmit()}}>
             Save Changes
           </Button>
         </Modal.Footer>
@@ -65,32 +74,34 @@ function EditGlobals(props) {
 }
 
 
+function Globals(props){
+  let eventPlanners = props.events.map(e => e.planner);
+  let coinemEvent = props.members.map(m => Object.values(m.coinem)).flat();
+  let coinemUser =  props.members.map(m => Object.values(m.coinem)).map(listElem => listElem.reduce((n,sum) => n+sum, 0)).flat()
 
-
-
-const Globals = props => (
+  return(
   <div>
     <span className="dashboardElem">
       {props.maxEvents}<br/>
       max events
-      <EditGlobals title={"Max Events"} handleSaveChanges={props.handleSaveChanges}></EditGlobals>
+      <EditGlobals title={"Max Events"} handleSaveChanges={props.handleSaveChanges} events={props.events} list={eventPlanners}></EditGlobals>
     </span>
     <span className="dashboardElem">
       {props.maxCoinemEvent}<br/>
       max coinem per event
-      <EditGlobals title="Max Coinem Per Event" handleSaveChanges={props.handleSaveChanges}></EditGlobals>
+      <EditGlobals title="Max Coinem Per Event" handleSaveChanges={props.handleSaveChanges} events={props.events} list={coinemEvent}></EditGlobals>
     </span>
     <span className="dashboardElem">
       {props.maxCoinem}<br/>
       max coinem per user
-      <EditGlobals title="Max Coinem Per User" handleSaveChanges={props.handleSaveChanges}></EditGlobals>
+      <EditGlobals title="Max Coinem Per User" handleSaveChanges={props.handleSaveChanges} events={props.events} list={coinemUser}></EditGlobals>
     </span>
     <span className="dashboardElem">
       {props.nextUID}<br/>
       next event UID
     </span>
-  </div>
-)
+  </div>);
+}
 
 const Members = props => (
   <div>
@@ -167,16 +178,6 @@ const Members = props => (
 
 )
 
-const EventPopover = props => (
-  <Popover id="popover-basic">
-    <Popover.Header as="h3">{props.membersInterested + " members interested:"}</Popover.Header>
-    <Popover.Body>
-      {props.message}
-    </Popover.Body>
-  </Popover>
-);
-
-
 function Events (props) {
   let membersCoinem = props.members.map(member => [member.username, member.coinem]);
 
@@ -216,8 +217,24 @@ function Events (props) {
   </div> )
   }
 
-
-
+  function AlertDismissible(props) {
+    const [show, setShow] = useState(props.showAlert);
+  
+    if (show) {
+      return (
+        <Alert variant="danger" onClose={() => setShow(false)} dismissible>
+          <Alert.Heading>Oh snap! You got an error!</Alert.Heading>
+          <p>
+            Change this and that and try again. Duis mollis, est non commodo
+            luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.
+            Cras mattis consectetur purus sit amet fermentum.
+          </p>
+        </Alert>
+      );
+    }
+    return <Button onClick={() => setShow(true)}>Show Alert</Button>;
+  }
+  
 
 
 /* Member components */
@@ -235,8 +252,6 @@ function Stats(props) {
       out of {props.maxCoinem} coinem left
     </span>
   </div>)}
-
-
 
 
 class App extends React.Component{
@@ -263,10 +278,7 @@ class App extends React.Component{
     this.downloadHandler = this.downloadHandler.bind(this);
     this.uploadHandler = this.uploadHandler.bind(this);
     this.openFileHandler = this.openFileHandler.bind(this);
-<<<<<<< HEAD
-=======
     this.handleSaveChanges = this.handleSaveChanges.bind(this);
->>>>>>> a22d4c77cfb19d2aef6da87487cb84b689baf4f5
   }
 
   handleInputChange(e){
@@ -339,14 +351,18 @@ class App extends React.Component{
     })
   }
 
-  // handleCancel(){
-  //   this.setState({show: false})
-  // }
-
-  handleSaveChanges(newGlobalValue, nameGlobal){
+  handleSaveChanges (newGlobalValue, nameGlobal, maxValue){
+    // let eventPlanners = this.state.events.map(e => e.planner);
+    // let coinemEvent = this.state.members.map(m => Object.values(m.coinem)).flat();
+    // let coinemUser =  this.state.members.map(m => Object.values(m.coinem)).map(listElem => listElem.reduce((n,sum) => n+sum, 0)).flat()
+    // const countOccurrences = (arr, val) => arr.reduce((a, v) => (v === val ? a + 1 : a), 0);
+    // let min = Math.min(...eventPlannersf.map(elem => countOccurrences(eventPlanners, elem)));
+    console.log(maxValue);
     switch(nameGlobal){
       case "Max Events":
-        this.setState({MAX_EVENTS: newGlobalValue});
+        if (newGlobalValue > maxValue){
+          this.setState({MAX_EVENTS: newGlobalValue});
+        }
         break;
       case "Max Coinem Per Event":
         this.setState({MAX_COINEM_PER_EVENT: newGlobalValue});
@@ -357,15 +373,6 @@ class App extends React.Component{
     }
   }
 
-  // updateMaxEvents(e){
-  //   this.setState({tempGlobalInfo: e.target.value})
-  // }
-
-  // handleOpen(){
-  //   this.setState({show: true, tempGlobalInfo: "",})
-  // }
-  
-
   uploadHandler(event) {
     event.preventDefault();
     this.domFileUpload.click() // This will browse for a file to upload 
@@ -373,14 +380,10 @@ class App extends React.Component{
                                // the input component's onChange handler.      
   }
 
-<<<<<<< HEAD
-  openFileHandler(event) {
-=======
   /**  
    * Process the uploaded file within the React app.
    */
    openFileHandler(event) {
->>>>>>> a22d4c77cfb19d2aef6da87487cb84b689baf4f5
     let fileInfoList = []; // Status output 
     const fileObj = event.target.files[0]; // From automated .click() on file input component
     const reader = new FileReader();
@@ -391,11 +394,6 @@ class App extends React.Component{
       fileInfoList.push(`File name: "${fileObj.name}". Length: ${fileContents.length} bytes.`);
       fileInfoList.push (`File contents: ${fileContents}`)
       const jsonData = JSON.parse(fileContents);
-<<<<<<< HEAD
-      const jsonJoinEmData = jsonData.restaurants
-      this.setState ({fileInfo: fileInfoList.join("\n")});
-      this.setState ({data: jsonRestaurantData});
-=======
       const jsonMembersData = jsonData.members
       const jsonEventsData = jsonData.events
       const jsonMAX_EVENTS = jsonData.MAX_EVENTS;
@@ -405,7 +403,6 @@ class App extends React.Component{
       this.setState ({fileInfo: fileInfoList.join("\n")});
       this.setState ({members: jsonMembersData, events: jsonEventsData, MAX_EVENTS: jsonMAX_EVENTS, MAX_COINEM: jsonMAX_COINEM,
         MAX_COINEM_PER_EVENT: jsonMAX_COINEM_PER_EVENT,  NEXT_EVENT_UID: jsonNEXT_UID});
->>>>>>> a22d4c77cfb19d2aef6da87487cb84b689baf4f5
     }
 
     // Mainline of the method 
@@ -456,6 +453,8 @@ class App extends React.Component{
                 maxCoinemEvent={this.state.MAX_COINEM_PER_EVENT}
                 nextUID ={this.state.NEXT_EVENT_UID}
                 handleSaveChanges={this.handleSaveChanges}
+                events={this.state.events}
+                members={this.state.members}
                 >
         </Globals>
         <ErrorBoundary>
@@ -480,34 +479,6 @@ class App extends React.Component{
                   maxCoinem={this.state.MAX_COINEM}>
           </Stats>
         }
-
-      {/* <Button variant="primary" onClick={this.handleOpen}>
-              Launch demo modal
-            </Button>
-
-      <Modal show={this.state.show} onHide={this.handleCancel}>
-        <Modal.Header>
-          <Modal.Title>Modal heading</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <label>
-          Max events:
-          <input type="text" 
-                  name="Amount"
-                  value ={this.state.tempGlobalInfo} 
-                  onChange={this.updateMaxEvents}>
-          </input>
-        </label>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={this.handleCancel}>
-            Cancel
-          </Button>
-          <Button variant="primary" onClick={this.handleSaveChanges}>
-            Save Changes
-          </Button>
-        </Modal.Footer>
-      </Modal> */}
       
       <input type="file"
             className="hidden"                                                                   
