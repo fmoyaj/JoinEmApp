@@ -52,12 +52,10 @@ function EditGlobals(props) {
                   value ={currentValue}
                   onChange={updateValue}>
           </input>
-          {(currentValue < maxValue& currentValue !== "") &&
+          {(currentValue < maxValue && currentValue !== "") &&
               <Alert key="alert" variant="danger">
               Invalid value for {props.title.toLowerCase()}. Submit a minimum value of {maxValue}.
-            </Alert>
-          
-          }
+            </Alert>}
         </label>
         </Modal.Body>
         <Modal.Footer>
