@@ -111,12 +111,12 @@ const Members = props => (
     <span className="inLineDivs">
       {props.data.length}
     </span>
-    <button className="simpleButton">
+    <Button variant="dark" className="simpleButton">
       Sort By
-    </button>
-    <button className="simpleButton" onClick={props.handleNewUser}>
+    </Button>
+    <Button variant="dark" className="simpleButton" onClick={props.handleNewUser}>
       Add Member
-    </button>
+    </Button>
     <form>
       <label>
         Username:
@@ -187,9 +187,9 @@ function Events (props) {
     <span className="inLineDivs">
       {props.data.length}
     </span>
-    <button className="simpleButton">
+    <Button variant="dark" className="simpleButton">
       Sort By
-    </button>
+    </Button>
     {props.data.map(event => (
       <div class="card">
         <h5 class="card-header" style={{ display: 'flex'}}>
@@ -233,6 +233,47 @@ function Stats(props) {
       out of {props.maxCoinem} coinem left
     </span>
   </div>)}
+
+const MemberView = props => (
+  <div>
+    <h3 className="inLineDivs">
+      Members
+    </h3>
+    <span className="inLineDivs">
+      {props.data.length}
+    </span>
+    <Button variant="dark" className="simpleButton">
+      Sort By
+    </Button>
+    <Table striped border hover>
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th># of Events Planned</th>
+          <th>Events</th>
+          <th>Coinem spent</th>
+          <th>Coinem pairs</th>
+        </tr>
+      </thead>
+      <tbody>
+        {props.data.map(member => (
+          <tr key={member.username}>
+            <td>{member.username}</td>
+            <td>{member.firstname}</td>
+            <td>{member.lastname}</td>
+            <td>{props.events.map(e => e.planner).filter(e => e === member.username).length}</td>
+            <td>{props.events.filter(e => e.planner === member.username).map(e => e.uid).join(', ')}</td>
+            <td>{Object.values(member.coinem).reduce((n,sum) => n+sum, 0)}</td>
+            <td>{Object.entries(member.coinem).map(c => '('+c[0]+','+c[1].toString()+')').join(', ')}</td>
+          </tr>
+        ))}
+      </tbody>
+    </Table>
+  </div>
+
+)
 
 
 class App extends React.Component{
@@ -456,38 +497,24 @@ class App extends React.Component{
 
         </Events>
         {this.state.currentUser !== "admin" &&
+        <div>
           <Stats members={this.state.members}
                   events={this.state.events} 
                   user={this.state.currentUser} 
                   maxEvents={this.state.MAX_EVENTS} 
                   maxCoinem={this.state.MAX_COINEM}>
-          </Stats> &&
+          </Stats> 
           <Accordion>
           <Accordion.Item eventKey="0">
-            <Accordion.Header>Accordion Item #1</Accordion.Header>
+            <Accordion.Header>Members</Accordion.Header>
             <Accordion.Body>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-              tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-              veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-              commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
-              velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
-              cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id
-              est laborum.
-            </Accordion.Body>
-          </Accordion.Item>
-          <Accordion.Item eventKey="1">
-            <Accordion.Header>Accordion Item #2</Accordion.Header>
-            <Accordion.Body>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-              tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-              veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-              commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
-              velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
-              cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id
-              est laborum.
+              <MemberView data={this.state.members} 
+                    events={this.state.events}>
+              </MemberView>
             </Accordion.Body>
           </Accordion.Item>
         </Accordion>
+        </div>
         }
       
       <input type="file"
