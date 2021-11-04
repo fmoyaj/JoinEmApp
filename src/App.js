@@ -6,7 +6,7 @@ import Button from 'react-bootstrap/Button';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Popover from 'react-bootstrap/Popover';
 import { Navbar } from 'react-bootstrap';
-import { Container, Alert, Accordion } from 'react-bootstrap';
+import { Container, Alert, Accordion, InputGroup, FormControl} from 'react-bootstrap';
 import {Dropdown} from 'react-bootstrap';
 import { Nav } from 'react-bootstrap';
 import editing from './icons/editing.png';
@@ -43,18 +43,19 @@ function EditGlobals(props) {
           <Modal.Title>{"Edit " + props.title}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <label>
-          {props.title + ":"}
-          <input type="text" 
-                  name={props.title}
-                  value ={currentValue}
-                  onChange={updateValue}>
-          </input>
+          <InputGroup className="mb-3">
+              <InputGroup.Text id="basic-addon1">{props.title}</InputGroup.Text>
+              <FormControl
+                aria-label="username"
+                aria-describedby="basic-addon1"
+                value ={currentValue}
+                onChange={updateValue}
+              />
+            </InputGroup>
           {(currentValue < props.maxValue && currentValue !== "") &&
               <Alert key="alert" variant="danger">
               Invalid value for {props.title.toLowerCase()}. Submit a minimum value of {props.maxValue}.
             </Alert>}
-        </label>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>
@@ -62,6 +63,98 @@ function EditGlobals(props) {
           </Button>
           <Button variant="primary" onClick={() => {props.handleSaveChanges(currentValue, props.title, props.maxValue); handleSubmit()}}>
             Save Changes
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </>
+  );
+}
+
+
+function AddMember(props) {
+  const [show, setShow] = useState(false);
+  const [currentUsername, setCurrentUsername] = useState("");
+  const [currentName, setCurrentName] = useState("");
+  const [currentLastname, setCurrentLastName] = useState("");
+
+  function handleClose() {
+    setShow(false);
+    setCurrentUsername("");
+    setCurrentName("");
+    setCurrentLastName("");
+  }
+  function handleSubmit() {
+    if (!(props.members.map(m => m.username).includes(currentUsername))){
+      setShow(false);
+      setCurrentUsername("");
+      setCurrentName("");
+      setCurrentLastName("");
+    } 
+  }
+  const handleOpen = () => setShow(true);
+
+  function updateValue(e){
+    const target = e.target;
+
+    switch(target.ariaLabel){
+      case "username":
+        setCurrentUsername(target.value);
+        break;
+      case "name":
+        setCurrentName(target.value);
+        break;
+      case "lastname":
+        setCurrentLastName(target.value);
+        break;
+    }
+  }
+
+  return (
+    <>
+      <Button variant="dark" onClick={handleOpen}>
+        Add New Member
+      </Button>
+      <Modal show={show} onHide={handleClose}>
+        <Modal.Header>
+          <Modal.Title>Add New Member</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <InputGroup className="mb-3">
+            <InputGroup.Text id="basic-addon1">Username</InputGroup.Text>
+            <FormControl
+              placeholder="Unique username"
+              aria-label="username"
+              aria-describedby="basic-addon1"
+              value ={currentUsername}
+              onChange={updateValue}
+            />
+          </InputGroup>
+          <InputGroup className="mb-3">
+            <InputGroup.Text id="basic-addon1">Name</InputGroup.Text>
+            <FormControl
+              placeholder="First name"
+              aria-label="name"
+              aria-describedby="basic-addon1"
+              value ={currentName}
+              onChange={updateValue}
+            />
+          </InputGroup>
+          <InputGroup className="mb-3">
+            <InputGroup.Text id="basic-addon1">Last Name</InputGroup.Text>
+            <FormControl
+              aria-label="lastname"
+              aria-describedby="basic-addon1"
+              value ={currentLastname}
+              onChange={updateValue}
+            />
+          </InputGroup>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Cancel
+          </Button>
+          <Button variant="primary" onClick={() => {props.submit(currentUsername, currentName, currentLastname); handleSubmit()}}>
+            Submit
           </Button>
         </Modal.Footer>
       </Modal>
@@ -114,36 +207,7 @@ const Members = props => (
     <Button variant="dark" className="simpleButton">
       Sort By
     </Button>
-    <Button variant="dark" className="simpleButton" onClick={props.handleNewUser}>
-      Add Member
-    </Button>
-    <form>
-      <label>
-        Username:
-        <input type="text" 
-              name="username" 
-              value ={props.newMember.username} 
-              onChange={props.handleInputChange}>
-        </input>
-      </label>
-      <label>
-        Name:
-        <input type="text" 
-                name="name"
-                value ={props.newMember.firstname} 
-                onChange={props.handleInputChange}>
-        </input>
-      </label>
-      <label>
-        Last Name:
-        <input type="text" 
-                name="lastName"
-                value ={props.newMember.lastname} 
-                onChange={props.handleInputChange}>
-        </input>
-      </label>
-    </form>
-    <button onClick={props.submit}>Add Member</button>
+    <AddMember submit={props.submit} members={props.data}></AddMember>
     <Table striped border hover>
       <thead>
         <tr>
@@ -356,13 +420,11 @@ class App extends React.Component{
     }
   }
 
-  handleNewUser(){
-    let memberToAdd = this.state.newMember;
-
+  handleNewUser(newUsername, newName, newLastname){
     // Checking that username is unique
-    if (!(this.state.members.map(m => m.username).includes(memberToAdd.username))){
-      this.setState({members: [...this.state.members, memberToAdd], 
-        newMember : {username: '', firstname: '', lastname: '', coinem: 0, }});
+    if (!(this.state.members.map(m => m.username).includes(newUsername))){
+      this.setState({members: [...this.state.members, {username: newUsername, firstname: newName, lastname: newLastname, coinem: {}}], 
+        });
     } else {
       alert("Can't add member. Choose a unique username");
     }
