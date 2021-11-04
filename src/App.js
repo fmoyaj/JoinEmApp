@@ -6,7 +6,7 @@ import Button from 'react-bootstrap/Button';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Popover from 'react-bootstrap/Popover';
 import { Navbar } from 'react-bootstrap';
-import { Container, Alert } from 'react-bootstrap';
+import { Container, Alert, Accordion } from 'react-bootstrap';
 import {Dropdown} from 'react-bootstrap';
 import { Nav } from 'react-bootstrap';
 import editing from './icons/editing.png';
@@ -345,10 +345,14 @@ class App extends React.Component{
         }
         break;
       case "Max Coinem Per Event":
-        this.setState({MAX_COINEM_PER_EVENT: newGlobalValue});
+        if (newGlobalValue > maxValue){
+          this.setState({MAX_COINEM_PER_EVENT: newGlobalValue});
+        }
         break;
       case "Max Coinem Per User":
-        this.setState({MAX_COINEM: newGlobalValue});
+        if (newGlobalValue > maxValue){
+          this.setState({MAX_COINEM: newGlobalValue});
+        }
         break;
     }
   }
@@ -407,7 +411,7 @@ class App extends React.Component{
           <Navbar.Collapse id="navbar-dark-example">
             <Nav>
               <Dropdown>
-                <Dropdown.Toggle>
+                <Dropdown.Toggle variant="secondary">
                   Members
                 </Dropdown.Toggle>
                 <Dropdown.Menu style={{ maxHeight: "200px", overflowY: "auto"}}>
@@ -424,7 +428,7 @@ class App extends React.Component{
 
         <div>
           <ErrorBoundary>
-          <button onClick={this.downloadHandler}>Download file</button>
+          <Button onClick={this.downloadHandler}>Download file</Button>
           </ErrorBoundary>
           <Button onClick={this.uploadHandler}>Upload file</Button>
         </div>
@@ -457,7 +461,33 @@ class App extends React.Component{
                   user={this.state.currentUser} 
                   maxEvents={this.state.MAX_EVENTS} 
                   maxCoinem={this.state.MAX_COINEM}>
-          </Stats>
+          </Stats> &&
+          <Accordion>
+          <Accordion.Item eventKey="0">
+            <Accordion.Header>Accordion Item #1</Accordion.Header>
+            <Accordion.Body>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+              tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
+              veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+              commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
+              velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
+              cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id
+              est laborum.
+            </Accordion.Body>
+          </Accordion.Item>
+          <Accordion.Item eventKey="1">
+            <Accordion.Header>Accordion Item #2</Accordion.Header>
+            <Accordion.Body>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+              tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
+              veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+              commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
+              velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
+              cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id
+              est laborum.
+            </Accordion.Body>
+          </Accordion.Item>
+        </Accordion>
         }
       
       <input type="file"
