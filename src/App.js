@@ -18,15 +18,13 @@ import { useState } from 'react';
 function EditGlobals(props) {
   const [show, setShow] = useState(false);
   const [currentValue, setCurrentValue] = useState("");
-  const countOccurrences = (arr, val) => arr.reduce((a, v) => (v === val ? a + 1 : a), 0);
-  let maxValue = Math.max(...props.list.map(elem => countOccurrences(props.list, elem)));
 
   function handleClose() {
     setShow(false);
     setCurrentValue("");
   }
   function handleSubmit() {
-    if(currentValue > maxValue){
+    if(currentValue > props.maxValue){
       setShow(false);
       setCurrentValue("");
     }
@@ -52,9 +50,9 @@ function EditGlobals(props) {
                   value ={currentValue}
                   onChange={updateValue}>
           </input>
-          {(currentValue < maxValue && currentValue !== "") &&
+          {(currentValue < props.maxValue && currentValue !== "") &&
               <Alert key="alert" variant="danger">
-              Invalid value for {props.title.toLowerCase()}. Submit a minimum value of {maxValue}.
+              Invalid value for {props.title.toLowerCase()}. Submit a minimum value of {props.maxValue}.
             </Alert>}
         </label>
         </Modal.Body>
@@ -62,7 +60,7 @@ function EditGlobals(props) {
           <Button variant="secondary" onClick={handleClose}>
             Cancel
           </Button>
-          <Button variant="primary" onClick={() => {props.handleSaveChanges(currentValue, props.title, maxValue); handleSubmit()}}>
+          <Button variant="primary" onClick={() => {props.handleSaveChanges(currentValue, props.title, props.maxValue); handleSubmit()}}>
             Save Changes
           </Button>
         </Modal.Footer>
@@ -76,23 +74,27 @@ function Globals(props){
   let eventPlanners = props.events.map(e => e.planner);
   let coinemEvent = props.members.map(m => Object.values(m.coinem)).flat();
   let coinemUser =  props.members.map(m => Object.values(m.coinem)).map(listElem => listElem.reduce((n,sum) => n+sum, 0)).flat()
+  const countOccurrences = (arr, val) => arr.reduce((a, v) => (v === val ? a + 1 : a), 0);
+  let maxEvents = Math.max(...eventPlanners.map(elem => countOccurrences(eventPlanners, elem)));
+  let maxCoinemEvent = Math.max(...coinemEvent);
+  let maxCoinemUser = Math.max(...coinemUser);
 
   return(
   <div>
     <span className="dashboardElem">
       {props.maxEvents}<br/>
       max events
-      <EditGlobals title={"Max Events"} handleSaveChanges={props.handleSaveChanges} events={props.events} list={eventPlanners}></EditGlobals>
+      <EditGlobals title={"Max Events"} handleSaveChanges={props.handleSaveChanges} events={props.events} maxValue={maxEvents}></EditGlobals>
     </span>
     <span className="dashboardElem">
       {props.maxCoinemEvent}<br/>
       max coinem per event
-      <EditGlobals title="Max Coinem Per Event" handleSaveChanges={props.handleSaveChanges} events={props.events} list={coinemEvent}></EditGlobals>
+      <EditGlobals title="Max Coinem Per Event" handleSaveChanges={props.handleSaveChanges} events={props.events} maxValue={maxCoinemEvent}></EditGlobals>
     </span>
     <span className="dashboardElem">
       {props.maxCoinem}<br/>
       max coinem per user
-      <EditGlobals title="Max Coinem Per User" handleSaveChanges={props.handleSaveChanges} events={props.events} list={coinemUser}></EditGlobals>
+      <EditGlobals title="Max Coinem Per User" handleSaveChanges={props.handleSaveChanges} events={props.events} maxValue={maxCoinemUser}></EditGlobals>
     </span>
     <span className="dashboardElem">
       {props.nextUID}<br/>
@@ -214,26 +216,7 @@ function Events (props) {
     ))}
   </div> )
   }
-
-  function AlertDismissible(props) {
-    const [show, setShow] = useState(props.showAlert);
   
-    if (show) {
-      return (
-        <Alert variant="danger" onClose={() => setShow(false)} dismissible>
-          <Alert.Heading>Oh snap! You got an error!</Alert.Heading>
-          <p>
-            Change this and that and try again. Duis mollis, est non commodo
-            luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.
-            Cras mattis consectetur purus sit amet fermentum.
-          </p>
-        </Alert>
-      );
-    }
-    return <Button onClick={() => setShow(true)}>Show Alert</Button>;
-  }
-  
-
 
 /* Member components */
 function Stats(props) {
@@ -355,7 +338,6 @@ class App extends React.Component{
     // let coinemUser =  this.state.members.map(m => Object.values(m.coinem)).map(listElem => listElem.reduce((n,sum) => n+sum, 0)).flat()
     // const countOccurrences = (arr, val) => arr.reduce((a, v) => (v === val ? a + 1 : a), 0);
     // let min = Math.min(...eventPlannersf.map(elem => countOccurrences(eventPlanners, elem)));
-    console.log(maxValue);
     switch(nameGlobal){
       case "Max Events":
         if (newGlobalValue > maxValue){
