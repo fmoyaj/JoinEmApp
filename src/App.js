@@ -234,6 +234,7 @@ function Stats(props) {
     </span>
   </div>)}
 
+/* Maybe just use conditional rendering for this!*/
 const MemberView = props => (
   <div>
     <h3 className="inLineDivs">
@@ -272,8 +273,49 @@ const MemberView = props => (
       </tbody>
     </Table>
   </div>
-
 )
+
+function MemberEvents (props) {
+  let membersCoinem = props.members.map(member => [member.username, member.coinem]);
+
+  return(
+  <div>
+    <h3 className="inLineDivs">Events</h3>
+    <span className="inLineDivs">
+      {props.data.length}
+    </span>
+    <Button variant="dark" className="simpleButton">
+      Sort By
+    </Button>
+    <Button variant="dark" className="simpleButton">
+      New Event
+    </Button>
+    {props.data.map(event => (
+      <div class="card">
+        <h5 class="card-header" style={{ display: 'flex'}}>
+          {event.uid.toString() + ". " + event.title}
+          <Button variant="outline-secondary" size="sm" 
+                  style={{ marginLeft: "auto" }}
+                  onClick={() => props.deleteEvent(event.uid)}>
+                    Delete
+          </Button>
+        </h5>
+        <div class="card-body">
+          <h5 class="card-title">{event.planner}</h5>
+          <p class="card-text">{event.description}</p>
+              <OverlayTrigger trigger="hover" placement="top" overlay={<Popover className="popover" >
+                {"Members interested: " + membersCoinem.filter(m => (Object.keys(m[1]).includes((event.uid).toString()))).length +  ('\n\n(') + 
+                membersCoinem.filter(m => (Object.keys(m[1]).includes((event.uid).toString()))).map(m => [m[0], m[1][event.uid]]).join('\n') + (')' + 
+                "\nTotal coinem: " + membersCoinem.filter(m => (Object.keys(m[1]).includes((event.uid).toString()))).map(m => m[1][event.uid]).reduce((n,sum) => n+sum, 0))
+                }
+                </Popover>}>
+              <Button variant="light"><img src={coinem} className="icons"/>{" " + membersCoinem.filter(m => (Object.keys(m[1]).includes((event.uid).toString()))).map(m => m[1][event.uid]).reduce((n,sum) => n+sum, 0)}</Button>
+              </OverlayTrigger>
+        </div>
+      </div>
+    ))}
+  </div> )
+  }
 
 
 class App extends React.Component{
@@ -374,11 +416,6 @@ class App extends React.Component{
   }
 
   handleSaveChanges (newGlobalValue, nameGlobal, maxValue){
-    // let eventPlanners = this.state.events.map(e => e.planner);
-    // let coinemEvent = this.state.members.map(m => Object.values(m.coinem)).flat();
-    // let coinemUser =  this.state.members.map(m => Object.values(m.coinem)).map(listElem => listElem.reduce((n,sum) => n+sum, 0)).flat()
-    // const countOccurrences = (arr, val) => arr.reduce((a, v) => (v === val ? a + 1 : a), 0);
-    // let min = Math.min(...eventPlannersf.map(elem => countOccurrences(eventPlanners, elem)));
     switch(nameGlobal){
       case "Max Events":
         if (newGlobalValue > maxValue){
@@ -495,7 +532,6 @@ class App extends React.Component{
           <Events data={this.state.events} 
                   members={this.state.members}
                   deleteEvent={this.deleteEvent}>
-
           </Events>
         
         <input type="file"
@@ -555,6 +591,10 @@ class App extends React.Component{
             </Accordion.Body>
           </Accordion.Item>
         </Accordion>
+        <MemberEvents data={this.state.events} 
+                  members={this.state.members}
+                  deleteEvent={this.deleteEvent}>
+        </MemberEvents>
         </div>
         }
       </div>
