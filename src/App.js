@@ -294,11 +294,6 @@ function MemberEvents (props) {
       <div class="card">
         <h5 class="card-header" style={{ display: 'flex'}}>
           {event.uid.toString() + ". " + event.title}
-          <Button variant="outline-secondary" size="sm" 
-                  style={{ marginLeft: "auto" }}
-                  onClick={() => props.deleteEvent(event.uid)}>
-                    Delete
-          </Button>
         </h5>
         <div class="card-body">
           <h5 class="card-title">{event.planner}</h5>
