@@ -420,6 +420,52 @@ function AddEvent(props) {
 function MemberEvents (props) {
   let membersCoinem = props.members.map(member => [member.username, member.coinem]);
 
+  const DisplayEvent = props => (
+    <div>
+    {props.event.planner == props.currentUser && 
+    <div class="card">
+        <h5 class="card-header" style={{ display: 'flex'}}>
+          {props.event.uid.toString() + ". " + props.event.title}
+          <Button variant="outline-secondary" size="sm" 
+                  style={{ marginLeft: "auto" }}
+                  onClick={() => props.deleteEvent(props.event.uid)}>
+                    Delete
+          </Button>
+        </h5>
+        <div class="card-body">
+          <h5 class="card-title">{props.event.planner}</h5>
+          <p class="card-text">{props.event.description}</p>
+              <OverlayTrigger trigger="hover" placement="top" overlay={<Popover className="popover" >
+                {"Members interested: " + membersCoinem.filter(m => (Object.keys(m[1]).includes((props.event.uid).toString()))).length +  ('\n\n(') + 
+                membersCoinem.filter(m => (Object.keys(m[1]).includes((props.event.uid).toString()))).map(m => [m[0], m[1][props.event.uid]]).join('\n') + (')' + 
+                "\nTotal coinem: " + membersCoinem.filter(m => (Object.keys(m[1]).includes((props.event.uid).toString()))).map(m => m[1][props.event.uid]).reduce((n,sum) => n+sum, 0))
+                }
+                </Popover>}>
+              <Button variant="light"><img src={coinem} className="icons"/>{" " + membersCoinem.filter(m => (Object.keys(m[1]).includes((props.event.uid).toString()))).map(m => m[1][props.event.uid]).reduce((n,sum) => n+sum, 0)}</Button>
+              </OverlayTrigger>
+        </div>
+      </div>}
+      {props.event.planner !== props.currentUser && 
+    <div class="card">
+        <h5 class="card-header" style={{ display: 'flex'}}>
+          {props.event.uid.toString() + ". " + props.event.title}
+        </h5>
+        <div class="card-body">
+          <h5 class="card-title">{props.event.planner}</h5>
+          <p class="card-text">{props.event.description}</p>
+              <OverlayTrigger trigger="hover" placement="top" overlay={<Popover className="popover" >
+                {"Members interested: " + membersCoinem.filter(m => (Object.keys(m[1]).includes((props.event.uid).toString()))).length +  ('\n\n(') + 
+                membersCoinem.filter(m => (Object.keys(m[1]).includes((props.event.uid).toString()))).map(m => [m[0], m[1][props.event.uid]]).join('\n') + (')' + 
+                "\nTotal coinem: " + membersCoinem.filter(m => (Object.keys(m[1]).includes((props.event.uid).toString()))).map(m => m[1][props.event.uid]).reduce((n,sum) => n+sum, 0))
+                }
+                </Popover>}>
+              <Button variant="light"><img src={coinem} className="icons"/>{" " + membersCoinem.filter(m => (Object.keys(m[1]).includes((props.event.uid).toString()))).map(m => m[1][props.event.uid]).reduce((n,sum) => n+sum, 0)}</Button>
+              </OverlayTrigger>
+        </div>
+      </div>}
+      </div>
+  )
+
   return(
   <div>
     <h3 className="inLineDivs">Events</h3>
@@ -429,28 +475,13 @@ function MemberEvents (props) {
     <Button variant="dark" className="simpleButton">
       Sort By
     </Button>
-    <AddEvent events={props.data} handleNewEvent={props.handleNewEvent} currentUser={props.currentUser} MAX_EVENTS={props.MAX_EVENTS}></AddEvent>
-    {props.data.map(event => (
-      <div class="card">
-        <h5 class="card-header" style={{ display: 'flex'}}>
-          {event.uid.toString() + ". " + event.title}
-        </h5>
-        <div class="card-body">
-          <h5 class="card-title">{event.planner}</h5>
-          <p class="card-text">{event.description}</p>
-              <OverlayTrigger trigger="hover" placement="top" overlay={<Popover className="popover" >
-                {"Members interested: " + membersCoinem.filter(m => (Object.keys(m[1]).includes((event.uid).toString()))).length +  ('\n\n(') + 
-                membersCoinem.filter(m => (Object.keys(m[1]).includes((event.uid).toString()))).map(m => [m[0], m[1][event.uid]]).join('\n') + (')' + 
-                "\nTotal coinem: " + membersCoinem.filter(m => (Object.keys(m[1]).includes((event.uid).toString()))).map(m => m[1][event.uid]).reduce((n,sum) => n+sum, 0))
-                }
-                </Popover>}>
-              <Button variant="light"><img src={coinem} className="icons"/>{" " + membersCoinem.filter(m => (Object.keys(m[1]).includes((event.uid).toString()))).map(m => m[1][event.uid]).reduce((n,sum) => n+sum, 0)}</Button>
-              </OverlayTrigger>
-        </div>
-      </div>
+    <AddEvent events={props.data} handleNewEvent={props.handleNewEvent} currentUser={props.currentUser} MAX_EVENTS={props.MAX_EVENTS} deleteEvent={props.deleteEvent}></AddEvent>
+    {props.data.map(e => (
+      <DisplayEvent event = {e} currentUser={props.currentUser} deleteEvent={props.deleteEvent}></DisplayEvent>
     ))}
   </div> )
   }
+
 
 
 class App extends React.Component{
