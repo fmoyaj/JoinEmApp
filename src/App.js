@@ -339,6 +339,84 @@ const MemberView = props => (
   </div>
 )
 
+function AddEvent(props) {
+  const [show, setShow] = useState(false);
+  const [currentTitle, setCurrentTitle] = useState("");
+  const [currentDescription, setCurrentDescription] = useState("");
+  let memberEvents = props.events.map(e => e.planner).filter(e => e === props.currentUser);
+
+  function handleClose() {
+    setShow(false);
+    setCurrentTitle("");
+    setCurrentDescription("");
+  }
+  function handleSubmit() {
+    if (currentTitle !== "" && currentDescription !== "" && memberEvents.length < props.MAX_EVENTS
+        && !props.events.map( e => e.title).includes(currentTitle)){
+      setShow(false);
+      setCurrentTitle("");
+      setCurrentDescription("");
+    } 
+  }
+  const handleOpen = () => setShow(true);
+
+  function updateValue(e){
+    const target = e.target;
+
+    switch(target.ariaLabel){
+      case "title":
+        setCurrentTitle(target.value);
+        break;
+      case "description":
+        setCurrentDescription(target.value);
+        break;
+    }
+  }
+
+  return (
+    <>
+      <Button variant="dark" onClick={handleOpen}>
+        New Event
+      </Button>
+      <Modal show={show} onHide={handleClose}>
+        <Modal.Header>
+          <Modal.Title>Add New Event</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <InputGroup className="mb-3">
+            <InputGroup.Text id="basic-addon1">Title</InputGroup.Text>
+            <FormControl
+              placeholder="Nonempty event title"
+              aria-label="title"
+              aria-describedby="basic-addon1"
+              value ={currentTitle}
+              onChange={updateValue}
+            />
+          </InputGroup>
+          <InputGroup className="mb-3">
+            <InputGroup.Text id="basic-addon1">Description</InputGroup.Text>
+            <FormControl as="textarea"
+              placeholder="Nonempty event description"
+              aria-label="description"
+              aria-describedby="basic-addon1"
+              value ={currentDescription}
+              onChange={updateValue}
+            />
+          </InputGroup>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Cancel
+          </Button>
+          <Button variant="primary" onClick={() => {props.handleNewEvent(currentTitle, currentDescription); handleSubmit()}}>
+            Submit
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </>
+  );
+}
+
 function MemberEvents (props) {
   let membersCoinem = props.members.map(member => [member.username, member.coinem]);
 
@@ -351,9 +429,7 @@ function MemberEvents (props) {
     <Button variant="dark" className="simpleButton">
       Sort By
     </Button>
-    <Button variant="dark" className="simpleButton">
-      New Event
-    </Button>
+    <AddEvent events={props.data} handleNewEvent={props.handleNewEvent} currentUser={props.currentUser} MAX_EVENTS={props.MAX_EVENTS}></AddEvent>
     {props.data.map(event => (
       <div class="card">
         <h5 class="card-header" style={{ display: 'flex'}}>
@@ -402,6 +478,7 @@ class App extends React.Component{
     this.uploadHandler = this.uploadHandler.bind(this);
     this.openFileHandler = this.openFileHandler.bind(this);
     this.handleSaveChanges = this.handleSaveChanges.bind(this);
+    this.handleNewEvent = this.handleNewEvent.bind(this);
   }
 
   handleInputChange(e){
@@ -535,6 +612,17 @@ class App extends React.Component{
     console.log(this.state.currentUser);
   }
 
+  /* Member-specific methods */
+  handleNewEvent(newTitle, newDescription){
+    let memberEvents = this.state.events.map(e => e.planner).filter(e => e === this.state.currentUser);
+
+    if(newTitle !== "" && newDescription !== "" 
+      && memberEvents.length < this.state.MAX_EVENTS && !this.state.events.map( e => e.title).includes(newTitle)){
+        this.setState({events: [...this.state.events, {uid: this.state.NEXT_EVENT_UID, title: newTitle, description: newDescription, planner: this.state.currentUser}], 
+        NEXT_EVENT_UID: this.state.NEXT_EVENT_UID + 1});
+    }
+  }
+
 
   render(){
     return (
@@ -650,7 +738,10 @@ class App extends React.Component{
         </Accordion>
         <MemberEvents data={this.state.events} 
                   members={this.state.members}
-                  deleteEvent={this.deleteEvent}>
+                  deleteEvent={this.deleteEvent}
+                  currentUser={this.state.currentUser}
+                  handleNewEvent={this.handleNewEvent}
+                  MAX_EVENTS={this.state.MAX_EVENTS}>
         </MemberEvents>
         </div>
         }
