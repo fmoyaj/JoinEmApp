@@ -445,57 +445,98 @@ class App extends React.Component{
   render(){
     return (
       <div>
-        <Navbar variant="dark" bg="dark" expand="lg">
-        <Container fluid>
-          <Navbar.Brand>Join'Em</Navbar.Brand>
-          <Navbar.Toggle aria-controls="navbar-dark-example" />
-          <Navbar.Collapse id="navbar-dark-example">
-            <Nav>
-              <Dropdown>
-                <Dropdown.Toggle variant="secondary">
-                  Members
-                </Dropdown.Toggle>
-                <Dropdown.Menu style={{ maxHeight: "200px", overflowY: "auto"}}>
-                  <Dropdown.Item onClick={()=> this.becomeMember("admin")}>admin</Dropdown.Item>
-                  {this.state.members.map(m =>
-                    <Dropdown.Item eventKey={m.username} onClick={()=> this.becomeMember(m.username)}>{m.username}</Dropdown.Item>
-                    )}
-                </Dropdown.Menu>
-            </Dropdown>
-            </Nav>
-          </Navbar.Collapse>
-        </Container>
-      </Navbar>
-
+          <Navbar variant="dark" bg="dark" expand="lg">
+            <Container fluid>
+              <Navbar.Brand>Join'Em</Navbar.Brand>
+              <Navbar.Toggle aria-controls="navbar-dark-example" />
+              <Navbar.Collapse id="navbar-dark-example">
+                <Nav>
+                  <Dropdown>
+                    <Dropdown.Toggle variant="secondary">
+                      Members
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu style={{ maxHeight: "200px", overflowY: "auto"}}>
+                      <Dropdown.Item onClick={()=> this.becomeMember("admin")}>admin</Dropdown.Item>
+                      {this.state.members.map(m =>
+                        <Dropdown.Item eventKey={m.username} onClick={()=> this.becomeMember(m.username)}>{m.username}</Dropdown.Item>
+                        )}
+                    </Dropdown.Menu>
+                </Dropdown>
+                </Nav>
+              </Navbar.Collapse>
+            </Container>
+          </Navbar>
+          { this.state.currentUser == "admin" &&
         <div>
-          <ErrorBoundary>
-          <Button onClick={this.downloadHandler}>Download file</Button>
-          </ErrorBoundary>
-          <Button onClick={this.uploadHandler}>Upload file</Button>
-        </div>
-        <Globals maxEvents={this.state.MAX_EVENTS}
-                maxCoinem={this.state.MAX_COINEM}
-                maxCoinemEvent={this.state.MAX_COINEM_PER_EVENT}
-                nextUID ={this.state.NEXT_EVENT_UID}
-                handleSaveChanges={this.handleSaveChanges}
-                events={this.state.events}
-                members={this.state.members}
-                >
-        </Globals>
-        <ErrorBoundary>
-        <Members data={this.state.members} 
+          <div>
+            <ErrorBoundary>
+            <Button onClick={this.downloadHandler}>Download file</Button>
+            </ErrorBoundary>
+            <Button onClick={this.uploadHandler}>Upload file</Button>
+          </div>
+          <Globals maxEvents={this.state.MAX_EVENTS}
+                  maxCoinem={this.state.MAX_COINEM}
+                  maxCoinemEvent={this.state.MAX_COINEM_PER_EVENT}
+                  nextUID ={this.state.NEXT_EVENT_UID}
+                  handleSaveChanges={this.handleSaveChanges}
                   events={this.state.events}
-                  newMember={this.state.newMember} 
-                  handleInputChange={this.handleInputChange}
-                  submit={this.handleNewUser}
-                  deleteMember={this.deleteMember}>
-        </Members>
-        </ErrorBoundary>
-        <Events data={this.state.events} 
-                members={this.state.members}
-                deleteEvent={this.deleteEvent}>
+                  members={this.state.members}
+                  >
+          </Globals>
+          <ErrorBoundary>
+          <Members data={this.state.members} 
+                    events={this.state.events}
+                    newMember={this.state.newMember} 
+                    handleInputChange={this.handleInputChange}
+                    submit={this.handleNewUser}
+                    deleteMember={this.deleteMember}>
+          </Members>
+          </ErrorBoundary>
+          <Events data={this.state.events} 
+                  members={this.state.members}
+                  deleteEvent={this.deleteEvent}>
 
-        </Events>
+          </Events>
+        
+        <input type="file"
+              className="hidden"                                                                   
+              multiple={false}
+              accept=".json, application/json" // Only upload JSON files                              
+              onChange={evt => this.openFileHandler(evt)}
+              ref={
+                // This is so-called "callback ref" that captures the associated
+                // DOM element on rendering.
+                // See https://reactjs.org/docs/refs-and-the-dom.html 
+                domElt => this.domFileUpload = domElt
+              }
+            />
+          
+            {/* <input type="file"
+              className="hidden"                                                                   
+              multiple={false}
+              accept=".json, application/json" // Only upload JSON files                              
+              onChange={evt => this.openFileHandler(evt)}
+              ref={
+                // This is so-called "callback ref" that captures the associated
+                // DOM element on rendering.
+                // See https://reactjs.org/docs/refs-and-the-dom.html 
+                domElt => this.domFileUpload = domElt
+              }
+            /> */}
+
+            <a className="hidden" 
+              download="joinemData.json" // download attribute specifies file name                                        // to download to when clicking link 
+              href={this.state.fileDownloadUrl}
+              ref={
+                // This is so-called "callback ref" that captures the associated 
+                // DOM element on rendering.
+                // See https://reactjs.org/docs/refs-and-the-dom.html
+                domElt => this.domFileDownload = domElt
+              }
+            >download it</a>
+          <pre className="status" className="hidden">{this.state.fileInfo}</pre>
+        </div> 
+        }
         {this.state.currentUser !== "admin" &&
         <div>
           <Stats members={this.state.members}
@@ -516,44 +557,6 @@ class App extends React.Component{
         </Accordion>
         </div>
         }
-      
-      <input type="file"
-            className="hidden"                                                                   
-            multiple={false}
-            accept=".json, application/json" // Only upload JSON files                              
-            onChange={evt => this.openFileHandler(evt)}
-            ref={
-              // This is so-called "callback ref" that captures the associated
-              // DOM element on rendering.
-              // See https://reactjs.org/docs/refs-and-the-dom.html 
-              domElt => this.domFileUpload = domElt
-            }
-          />
-        
-           {/* <input type="file"
-            className="hidden"                                                                   
-            multiple={false}
-            accept=".json, application/json" // Only upload JSON files                              
-            onChange={evt => this.openFileHandler(evt)}
-            ref={
-              // This is so-called "callback ref" that captures the associated
-              // DOM element on rendering.
-              // See https://reactjs.org/docs/refs-and-the-dom.html 
-              domElt => this.domFileUpload = domElt
-            }
-          /> */}
-
-          <a className="hidden" 
-            download="joinemData.json" // download attribute specifies file name                                        // to download to when clicking link 
-             href={this.state.fileDownloadUrl}
-             ref={
-              // This is so-called "callback ref" that captures the associated 
-              // DOM element on rendering.
-              // See https://reactjs.org/docs/refs-and-the-dom.html
-              domElt => this.domFileDownload = domElt
-            }
-          >download it</a>
-        <pre className="status" className="hidden">{this.state.fileInfo}</pre>
       </div>
     );
   }
