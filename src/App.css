@@ -96,3 +96,16 @@ header{
     transform: rotate(360deg);
   }
 }
+
+
+/* Event Cards */
+.card-mainDetails{
+  float:left;
+  width:70%;
+}
+.card-editFeatures {
+  float:right; 
+  background:lightblue;
+  width:20%;
+  height:100%;
+}

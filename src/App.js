@@ -13,6 +13,8 @@ import editing from './icons/editing.png';
 import coinem from './icons/coinem_icon.png'
 import { Modal } from 'react-bootstrap';
 import { useState } from 'react';
+import MaterialButton from '@material-ui/core/Button';
+import ButtonGroup from '@material-ui/core/ButtonGroup';
 
 /* Admin components */
 function EditGlobals(props) {
@@ -417,11 +419,16 @@ function AddEvent(props) {
   );
 }
 
-function MemberEvents (props) {
+function DisplayEvent(props){
   let membersCoinem = props.members.map(member => [member.username, member.coinem]);
-
-  const DisplayEvent = props => (
-    <div>
+  let currentCoinemSpent = 0;
+  if (props.members.filter(member => member.username==props.currentUser)[0].coinem[props.event.uid] == undefined) {
+    currentCoinemSpent = 0;
+  } else {
+    currentCoinemSpent = props.members.filter(member => member.username==props.currentUser)[0].coinem[props.event.uid]
+  }
+  
+  return (<div>
     {props.event.planner == props.currentUser && 
     <div class="card">
         <h5 class="card-header" style={{ display: 'flex'}}>
@@ -451,21 +458,39 @@ function MemberEvents (props) {
           {props.event.uid.toString() + ". " + props.event.title}
         </h5>
         <div class="card-body">
-          <h5 class="card-title">{props.event.planner}</h5>
-          <p class="card-text">{props.event.description}</p>
-              <OverlayTrigger trigger="hover" placement="top" overlay={<Popover className="popover" >
-                {"Members interested: " + membersCoinem.filter(m => (Object.keys(m[1]).includes((props.event.uid).toString()))).length +  ('\n\n(') + 
-                membersCoinem.filter(m => (Object.keys(m[1]).includes((props.event.uid).toString()))).map(m => [m[0], m[1][props.event.uid]]).join('\n') + (')' + 
-                "\nTotal coinem: " + membersCoinem.filter(m => (Object.keys(m[1]).includes((props.event.uid).toString()))).map(m => m[1][props.event.uid]).reduce((n,sum) => n+sum, 0))
-                }
-                </Popover>}>
-              <Button variant="light"><img src={coinem} className="icons"/>{" " + membersCoinem.filter(m => (Object.keys(m[1]).includes((props.event.uid).toString()))).map(m => m[1][props.event.uid]).reduce((n,sum) => n+sum, 0)}</Button>
-              </OverlayTrigger>
+          <div class="card-mainDetails">
+            <h5 class="card-title">{props.event.planner}</h5>
+            <p class="card-text">{props.event.description}</p>
+                <OverlayTrigger trigger="hover" placement="top" overlay={<Popover className="popover" >
+                  {"Members interested: " + membersCoinem.filter(m => (Object.keys(m[1]).includes((props.event.uid).toString()))).length +  ('\n\n(') + 
+                  membersCoinem.filter(m => (Object.keys(m[1]).includes((props.event.uid).toString()))).map(m => [m[0], m[1][props.event.uid]]).join('\n') + (')' + 
+                  "\nTotal coinem: " + membersCoinem.filter(m => (Object.keys(m[1]).includes((props.event.uid).toString()))).map(m => m[1][props.event.uid]).reduce((n,sum) => n+sum, 0))
+                  }
+                  </Popover>}>
+                <Button variant="light"><img src={coinem} className="icons"/>{" " + membersCoinem.filter(m => (Object.keys(m[1]).includes((props.event.uid).toString()))).map(m => m[1][props.event.uid]).reduce((n,sum) => n+sum, 0)}</Button>
+                </OverlayTrigger>
+          </div>
+          <div class="card-editFeatures">
+            <div class="coinemSpentOnEvent">{currentCoinemSpent} coinem spent</div>
+            <ButtonGroup>
+              <MaterialButton 
+                aria-label="reduce"
+                onClick={() => props.toggleCoinemSpent(currentCoinemSpent, "reduce", props.event.uid)}>
+                -
+              </MaterialButton>
+              <MaterialButton
+                aria-label="increase"
+                onClick={() => props.toggleCoinemSpent(currentCoinemSpent, "increase", props.event.uid)}>
+                +
+              </MaterialButton>
+            </ButtonGroup>
+          </div>
         </div>
       </div>}
-      </div>
-  )
+      </div>); 
+}
 
+function MemberEvents (props) {
   return(
   <div>
     <h3 className="inLineDivs">Events</h3>
@@ -477,7 +502,7 @@ function MemberEvents (props) {
     </Button>
     <AddEvent events={props.data} handleNewEvent={props.handleNewEvent} currentUser={props.currentUser} MAX_EVENTS={props.MAX_EVENTS} deleteEvent={props.deleteEvent}></AddEvent>
     {props.data.map(e => (
-      <DisplayEvent event = {e} currentUser={props.currentUser} deleteEvent={props.deleteEvent}></DisplayEvent>
+      <DisplayEvent event = {e} members={props.members} currentUser={props.currentUser} deleteEvent={props.deleteEvent} toggleCoinemSpent={props.toggleCoinemSpent}></DisplayEvent>
     ))}
   </div> )
   }
@@ -510,6 +535,7 @@ class App extends React.Component{
     this.openFileHandler = this.openFileHandler.bind(this);
     this.handleSaveChanges = this.handleSaveChanges.bind(this);
     this.handleNewEvent = this.handleNewEvent.bind(this);
+    this.toggleCoinemSpent = this.toggleCoinemSpent.bind(this);
   }
 
   handleInputChange(e){
@@ -654,7 +680,26 @@ class App extends React.Component{
     }
   }
 
+  toggleCoinemSpent(currentCoinemSpent, operation, uid){
+    let currentUserInfo = this.state.members.filter(member => member.username==this.state.currentUser)[0]
+    let currentCoinem = currentUserInfo.coinem[uid] == undefined? 0:currentUserInfo.coinem[uid];
 
+    if (currentCoinemSpent <= this.state.MAX_COINEM_PER_EVENT) {
+      // Addition
+      if(operation == "increase" && currentCoinemSpent < this.state.MAX_COINEM_PER_EVENT) {
+        let newValue = currentCoinem  + 1;
+        let newCoinem = {...currentUserInfo.coinem, [uid]: newValue};
+        this.setState({members:[...this.state.members.filter(member => member.username!==this.state.currentUser), {...currentUserInfo, coinem: newCoinem}]});
+      }
+      // Substraction
+      if(operation == "reduce" && currentCoinemSpent>0){
+        let newValue = currentCoinem - 1;
+        let newCoinem = {...currentUserInfo.coinem, [uid]: newValue};
+        this.setState({members:[...this.state.members.filter(member => member.username!==this.state.currentUser), {...currentUserInfo, coinem: newCoinem}]});
+      }
+    }
+  }
+  
   render(){
     return (
       <div>
@@ -772,6 +817,7 @@ class App extends React.Component{
                   deleteEvent={this.deleteEvent}
                   currentUser={this.state.currentUser}
                   handleNewEvent={this.handleNewEvent}
+                  toggleCoinemSpent={this.toggleCoinemSpent}
                   MAX_EVENTS={this.state.MAX_EVENTS}>
         </MemberEvents>
         </div>
