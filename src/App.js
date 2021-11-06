@@ -241,7 +241,6 @@ const Members = props => (
       </tbody>
     </Table>
   </div>
-
 )
 
 function Events (props) {
@@ -281,7 +280,7 @@ function Events (props) {
       </div>
     ))}
   </div> )
-  }
+}
   
 
 /* Member components */
@@ -298,7 +297,8 @@ function Stats(props) {
       {props.maxCoinem-Object.values(member.coinem).reduce((n,sum) => n+sum, 0)}<br/>
       out of {props.maxCoinem} coinem left
     </span>
-  </div>)}
+  </div>)
+}
 
 /* Maybe just use conditional rendering for this!*/
 const MemberView = props => (
@@ -341,24 +341,29 @@ const MemberView = props => (
   </div>
 )
 
-function AddEvent(props) {
+// Create a new event or edit existing event
+function ModifyEvent(props) {
   const [show, setShow] = useState(false);
-  const [currentTitle, setCurrentTitle] = useState("");
-  const [currentDescription, setCurrentDescription] = useState("");
+  const [currentTitle, setCurrentTitle] = useState(props.initialTitle);
+  const [currentDescription, setCurrentDescription] = useState(props.initialDescription);
+  const [newEvent, setNewEvent] = useState(props.newEvent);
   let memberEvents = props.events.map(e => e.planner).filter(e => e === props.currentUser);
 
   function handleClose() {
     setShow(false);
+    if (newEvent){
     setCurrentTitle("");
     setCurrentDescription("");
+    }
   }
   function handleSubmit() {
-    if (currentTitle !== "" && currentDescription !== "" && memberEvents.length < props.MAX_EVENTS
-        && !props.events.map( e => e.title).includes(currentTitle)){
+    if (currentTitle !== "" && currentDescription !== ""){
       setShow(false);
-      setCurrentTitle("");
-      setCurrentDescription("");
-    } 
+      if(newEvent && memberEvents.length < props.MAX_EVENTS
+        && !props.events.map( e => e.title).includes(currentTitle))
+          setCurrentTitle("");
+          setCurrentDescription("");
+    }
   }
   const handleOpen = () => setShow(true);
 
@@ -378,11 +383,11 @@ function AddEvent(props) {
   return (
     <>
       <Button variant="dark" onClick={handleOpen}>
-        New Event
+        {props.buttonTitle}
       </Button>
       <Modal show={show} onHide={handleClose}>
         <Modal.Header>
-          <Modal.Title>Add New Event</Modal.Title>
+          <Modal.Title>{props.buttonTitle}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <InputGroup className="mb-3">
@@ -410,9 +415,16 @@ function AddEvent(props) {
           <Button variant="secondary" onClick={handleClose}>
             Cancel
           </Button>
+          { newEvent &&
           <Button variant="primary" onClick={() => {props.handleNewEvent(currentTitle, currentDescription); handleSubmit()}}>
             Submit
           </Button>
+          }
+          { !newEvent &&
+          <Button variant="primary" onClick={() => {props.handleEditEvent(currentTitle, currentDescription, props.initialUid); handleSubmit()}}>
+            Submit
+          </Button>
+          }
         </Modal.Footer>
       </Modal>
     </>
@@ -422,10 +434,10 @@ function AddEvent(props) {
 function DisplayEvent(props){
   let membersCoinem = props.members.map(member => [member.username, member.coinem]);
   let currentCoinemSpent = 0;
-  if (props.members.filter(member => member.username==props.currentUser)[0].coinem[props.event.uid] == undefined) {
+  if (props.members.filter(member => member.username===props.currentUser)[0].coinem[props.event.uid] == undefined) {
     currentCoinemSpent = 0;
   } else {
-    currentCoinemSpent = props.members.filter(member => member.username==props.currentUser)[0].coinem[props.event.uid]
+    currentCoinemSpent = props.members.filter(member => member.username===props.currentUser)[0].coinem[props.event.uid]
   }
   
   return (<div>
@@ -433,15 +445,11 @@ function DisplayEvent(props){
     <div class="card">
         <h5 class="card-header" style={{ display: 'flex'}}>
           {props.event.uid.toString() + ". " + props.event.title}
-          <Button variant="outline-secondary" size="sm" 
-                  style={{ marginLeft: "auto" }}
-                  onClick={() => props.deleteEvent(props.event.uid)}>
-                    Delete
-          </Button>
         </h5>
         <div class="card-body">
           <h5 class="card-title">{props.event.planner}</h5>
           <p class="card-text">{props.event.description}</p>
+            <div class="card-mainDetails"> 
               <OverlayTrigger trigger="hover" placement="top" overlay={<Popover className="popover" >
                 {"Members interested: " + membersCoinem.filter(m => (Object.keys(m[1]).includes((props.event.uid).toString()))).length +  ('\n\n(') + 
                 membersCoinem.filter(m => (Object.keys(m[1]).includes((props.event.uid).toString()))).map(m => [m[0], m[1][props.event.uid]]).join('\n') + (')' + 
@@ -450,6 +458,18 @@ function DisplayEvent(props){
                 </Popover>}>
               <Button variant="light"><img src={coinem} className="icons"/>{" " + membersCoinem.filter(m => (Object.keys(m[1]).includes((props.event.uid).toString()))).map(m => m[1][props.event.uid]).reduce((n,sum) => n+sum, 0)}</Button>
               </OverlayTrigger>
+            </div>
+            <div class="card-editFeatures">
+              {/*event = {e} members={props.members} currentUser={props.currentUser} deleteEvent={props.deleteEvent} toggleCoinemSpent={props.toggleCoinemSpent}
+                modifyEvent -> events={props.data} handleNewEvent={props.handleNewEvent} currentUser={props.currentUser} MAX_EVENTS={props.MAX_EVENTS} deleteEvent={props.deleteEvent} initialTitle={""} initialDescription={""} buttonTitle={"New Event"}
+              */}
+              <ModifyEvent events={props.events} handleEditEvent={props.handleEditEvent} handleNewEvent={props.handleNewEvent} currentUser={props.currentUser} MAX_EVENTS={props.MAX_EVENTS} deleteEvent={props.deleteEvent} initialTitle={props.event.title} initialDescription={props.event.description} initialUid={props.event.uid} buttonTitle={"Edit"} newEvent={false}></ModifyEvent>
+              <Button variant="outline-secondary" size="sm" 
+                      style={{ marginLeft: "auto" }}
+                      onClick={() => props.deleteEvent(props.event.uid)}>
+                Delete
+              </Button>
+            </div>
         </div>
       </div>}
       {props.event.planner !== props.currentUser && 
@@ -500,11 +520,49 @@ function MemberEvents (props) {
     <Button variant="dark" className="simpleButton">
       Sort By
     </Button>
-    <AddEvent events={props.data} handleNewEvent={props.handleNewEvent} currentUser={props.currentUser} MAX_EVENTS={props.MAX_EVENTS} deleteEvent={props.deleteEvent}></AddEvent>
+    <ModifyEvent events={props.data} handleNewEvent={props.handleNewEvent} currentUser={props.currentUser} MAX_EVENTS={props.MAX_EVENTS} deleteEvent={props.deleteEvent} initialTitle={""} initialDescription={""} buttonTitle={"New Event"} newEvent={true}></ModifyEvent>
     {props.data.map(e => (
-      <DisplayEvent event = {e} members={props.members} currentUser={props.currentUser} deleteEvent={props.deleteEvent} toggleCoinemSpent={props.toggleCoinemSpent}></DisplayEvent>
+      <DisplayEvent event = {e} members={props.members} currentUser={props.currentUser} deleteEvent={props.deleteEvent} toggleCoinemSpent={props.toggleCoinemSpent} events={props.data} handleNewEvent={props.handleNewEvent} handleEditEvent={props.handleEditEvent} MAX_EVENTS={props.MAX_EVENTS}></DisplayEvent>
     ))}
   </div> )
+  }
+
+  function DeleteAccount(props) {
+    const [show, setShow] = useState(false);
+    
+    function handleClose() {
+      setShow(false);
+    }
+
+    function handleConfirm(username) {
+      setShow(false);
+    }
+
+    const handleOpen = () => setShow(true);
+  
+    return (
+      <>
+        <Button variant="danger" onClick={handleOpen}>
+          Delete Account
+        </Button>
+        <Modal show={show} onHide={handleClose}>
+          <Modal.Header>
+            <Modal.Title>{props.buttonTitle}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            Are you sure you would like to delete your account? This action cannot be reversed.
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={handleClose}>
+              Cancel
+            </Button>
+            <Button variant="danger" onClick={() => {props.deleteMember(props.currentUser); handleConfirm()}}>
+              Confirm
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      </>
+    );
   }
 
 
@@ -536,6 +594,7 @@ class App extends React.Component{
     this.handleSaveChanges = this.handleSaveChanges.bind(this);
     this.handleNewEvent = this.handleNewEvent.bind(this);
     this.toggleCoinemSpent = this.toggleCoinemSpent.bind(this);
+    this.handleEditEvent = this.handleEditEvent.bind(this);
   }
 
   handleInputChange(e){
@@ -566,7 +625,9 @@ class App extends React.Component{
 
   deleteMember(username){
     this.setState({members: this.state.members.filter(m => m.username !== username),
-                  events: this.state.events.filter(e => e.planner !== username)});
+                  events: this.state.events.filter(e => e.planner !== username), 
+                currentUser: "admin"});
+    
 
   }
 
@@ -678,21 +739,46 @@ class App extends React.Component{
         this.setState({events: [...this.state.events, {uid: this.state.NEXT_EVENT_UID, title: newTitle, description: newDescription, planner: this.state.currentUser}], 
         NEXT_EVENT_UID: this.state.NEXT_EVENT_UID + 1});
     }
+    else{
+      if(newTitle === "" || newDescription === ""){
+        alert("Please fill out all text fields before submitting!");  
+      }
+      // User chooses non-unique title
+      else {
+        alert("Event title already taken. Please choose a unique title for your event.")
+      }
+    }
   }
 
+  handleEditEvent(title, description, currentUid){
+    let index = this.state.events.indexOf(this.state.events.filter(e => e.uid == currentUid)[0]);
+    let updatedEvents = this.state.events.filter(e => e.uid != currentUid);
+    updatedEvents.splice(index, 0, {uid: currentUid, title: title, description: description, planner: this.state.currentUser});
+    if(title !== "" && description !== "") {
+        this.setState({events: updatedEvents});
+    }
+    else{
+      if(title === "" || description === ""){
+        alert("Please fill out all text fields before submitting!");  
+      }
+    }
+  }
+
+
+
   toggleCoinemSpent(currentCoinemSpent, operation, uid){
-    let currentUserInfo = this.state.members.filter(member => member.username==this.state.currentUser)[0]
+    let currentUserInfo = this.state.members.filter(member => member.username===this.state.currentUser)[0]
     let currentCoinem = currentUserInfo.coinem[uid] == undefined? 0:currentUserInfo.coinem[uid];
 
     if (currentCoinemSpent <= this.state.MAX_COINEM_PER_EVENT) {
       // Addition
-      if(operation == "increase" && currentCoinemSpent < this.state.MAX_COINEM_PER_EVENT) {
+      if(operation === "increase" && currentCoinemSpent < this.state.MAX_COINEM_PER_EVENT) {
         let newValue = currentCoinem  + 1;
         let newCoinem = {...currentUserInfo.coinem, [uid]: newValue};
         this.setState({members:[...this.state.members.filter(member => member.username!==this.state.currentUser), {...currentUserInfo, coinem: newCoinem}]});
       }
       // Substraction
-      if(operation == "reduce" && currentCoinemSpent>0){
+      if(operation === "reduce" && currentCoinemSpent>0){
         let newValue = currentCoinem - 1;
         let newCoinem = {...currentUserInfo.coinem, [uid]: newValue};
         this.setState({members:[...this.state.members.filter(member => member.username!==this.state.currentUser), {...currentUserInfo, coinem: newCoinem}]});
@@ -725,75 +811,75 @@ class App extends React.Component{
             </Container>
           </Navbar>
           { this.state.currentUser == "admin" &&
-        <div>
-          <div>
-            <ErrorBoundary>
-            <Button onClick={this.downloadHandler}>Download file</Button>
-            </ErrorBoundary>
-            <Button onClick={this.uploadHandler}>Upload file</Button>
-          </div>
-          <Globals maxEvents={this.state.MAX_EVENTS}
-                  maxCoinem={this.state.MAX_COINEM}
-                  maxCoinemEvent={this.state.MAX_COINEM_PER_EVENT}
-                  nextUID ={this.state.NEXT_EVENT_UID}
-                  handleSaveChanges={this.handleSaveChanges}
-                  events={this.state.events}
-                  members={this.state.members}
-                  >
-          </Globals>
-          <ErrorBoundary>
-          <Members data={this.state.members} 
-                    events={this.state.events}
-                    newMember={this.state.newMember} 
-                    handleInputChange={this.handleInputChange}
-                    submit={this.handleNewUser}
-                    deleteMember={this.deleteMember}>
-          </Members>
-          </ErrorBoundary>
-          <Events data={this.state.events} 
-                  members={this.state.members}
-                  deleteEvent={this.deleteEvent}>
-          </Events>
-        
-        <input type="file"
-              className="hidden"                                                                   
-              multiple={false}
-              accept=".json, application/json" // Only upload JSON files                              
-              onChange={evt => this.openFileHandler(evt)}
-              ref={
-                // This is so-called "callback ref" that captures the associated
-                // DOM element on rendering.
-                // See https://reactjs.org/docs/refs-and-the-dom.html 
-                domElt => this.domFileUpload = domElt
-              }
-            />
-          
-            {/* <input type="file"
-              className="hidden"                                                                   
-              multiple={false}
-              accept=".json, application/json" // Only upload JSON files                              
-              onChange={evt => this.openFileHandler(evt)}
-              ref={
-                // This is so-called "callback ref" that captures the associated
-                // DOM element on rendering.
-                // See https://reactjs.org/docs/refs-and-the-dom.html 
-                domElt => this.domFileUpload = domElt
-              }
-            /> */}
+            <div>
+              <div>
+                <ErrorBoundary>
+                <Button onClick={this.downloadHandler}>Download file</Button>
+                </ErrorBoundary>
+                <Button onClick={this.uploadHandler}>Upload file</Button>
+              </div>
+              <Globals maxEvents={this.state.MAX_EVENTS}
+                      maxCoinem={this.state.MAX_COINEM}
+                      maxCoinemEvent={this.state.MAX_COINEM_PER_EVENT}
+                      nextUID ={this.state.NEXT_EVENT_UID}
+                      handleSaveChanges={this.handleSaveChanges}
+                      events={this.state.events}
+                      members={this.state.members}
+                      >
+              </Globals>
+              <ErrorBoundary>
+              <Members data={this.state.members} 
+                        events={this.state.events}
+                        newMember={this.state.newMember} 
+                        handleInputChange={this.handleInputChange}
+                        submit={this.handleNewUser}
+                        deleteMember={this.deleteMember}>
+              </Members>
+              </ErrorBoundary>
+              <Events data={this.state.events} 
+                      members={this.state.members}
+                      deleteEvent={this.deleteEvent}>
+              </Events>
+            
+              <input type="file"
+                className="hidden"                                                                   
+                multiple={false}
+                accept=".json, application/json" // Only upload JSON files                              
+                onChange={evt => this.openFileHandler(evt)}
+                ref={
+                  // This is so-called "callback ref" that captures the associated
+                  // DOM element on rendering.
+                  // See https://reactjs.org/docs/refs-and-the-dom.html 
+                  domElt => this.domFileUpload = domElt
+                }
+              />
+            
+              {/* <input type="file"
+                className="hidden"                                                                   
+                multiple={false}
+                accept=".json, application/json" // Only upload JSON files                              
+                onChange={evt => this.openFileHandler(evt)}
+                ref={
+                  // This is so-called "callback ref" that captures the associated
+                  // DOM element on rendering.
+                  // See https://reactjs.org/docs/refs-and-the-dom.html 
+                  domElt => this.domFileUpload = domElt
+                }
+              /> */}
 
-            <a className="hidden" 
-              download="joinemData.json" // download attribute specifies file name                                        // to download to when clicking link 
-              href={this.state.fileDownloadUrl}
-              ref={
-                // This is so-called "callback ref" that captures the associated 
-                // DOM element on rendering.
-                // See https://reactjs.org/docs/refs-and-the-dom.html
-                domElt => this.domFileDownload = domElt
-              }
-            >download it</a>
-          <pre className="status" className="hidden">{this.state.fileInfo}</pre>
-        </div> 
-        }
+              <a className="hidden" 
+                download="joinemData.json" // download attribute specifies file name                                        // to download to when clicking link 
+                href={this.state.fileDownloadUrl}
+                ref={
+                  // This is so-called "callback ref" that captures the associated 
+                  // DOM element on rendering.
+                  // See https://reactjs.org/docs/refs-and-the-dom.html
+                  domElt => this.domFileDownload = domElt
+                }
+              >download it</a>
+              <pre className="status" className="hidden">{this.state.fileInfo}</pre>
+            </div> 
+          }
         {this.state.currentUser !== "admin" &&
         <div>
           <Stats members={this.state.members}
@@ -802,24 +888,26 @@ class App extends React.Component{
                   maxEvents={this.state.MAX_EVENTS} 
                   maxCoinem={this.state.MAX_COINEM}>
           </Stats> 
-          <Accordion>
-          <Accordion.Item eventKey="0">
-            <Accordion.Header>Members</Accordion.Header>
-            <Accordion.Body>
-              <MemberView data={this.state.members} 
-                    events={this.state.events}>
-              </MemberView>
-            </Accordion.Body>
-          </Accordion.Item>
-        </Accordion>
-        <MemberEvents data={this.state.events} 
-                  members={this.state.members}
-                  deleteEvent={this.deleteEvent}
-                  currentUser={this.state.currentUser}
-                  handleNewEvent={this.handleNewEvent}
-                  toggleCoinemSpent={this.toggleCoinemSpent}
-                  MAX_EVENTS={this.state.MAX_EVENTS}>
-        </MemberEvents>
+            <Accordion>
+            <Accordion.Item eventKey="0">
+              <Accordion.Header>Members</Accordion.Header>
+              <Accordion.Body>
+                <MemberView data={this.state.members} 
+                      events={this.state.events}>
+                </MemberView>
+              </Accordion.Body>
+            </Accordion.Item>
+          </Accordion>
+          <MemberEvents data={this.state.events} 
+                    members={this.state.members}
+                    deleteEvent={this.deleteEvent}
+                    currentUser={this.state.currentUser}
+                    handleNewEvent={this.handleNewEvent}
+                    toggleCoinemSpent={this.toggleCoinemSpent}
+                    MAX_EVENTS={this.state.MAX_EVENTS}
+                    handleEditEvent={this.handleEditEvent}>
+          </MemberEvents>
+          <DeleteAccount deleteMember={this.deleteMember} currentUser = {this.state.currentUser}></DeleteAccount>
         </div>
         }
       </div>
