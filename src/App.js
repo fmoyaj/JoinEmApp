@@ -15,6 +15,8 @@ import { Modal } from 'react-bootstrap';
 import { useState, useEffect } from 'react';
 import MaterialButton from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
+import {RadioGroup, Radio, FormLabel, FormControlLabel} from '@material-ui/core';
+import MUFormControl from '@material-ui/core/FormControl';
 
 /* Admin components */
 function EditGlobals(props) {
@@ -199,25 +201,34 @@ function Globals(props){
 }
 
 function Members(props){
+  // Arrow functions to extract the number of events of a member and the number of coinem spent by a member
   let numEvents = (member) => props.events.map(e => e.planner).filter(e => e === member.username).length;
   let numCoinem = (member) => Object.values(member.coinem).reduce((n,sum) => n+sum, 0);
+
 
   const [memberData, setData] = React.useState(props.data.map((m) => {return {username: m.username, 
     firstname: m.firstname, lastname: m.lastname,
     coinem: m.coinem, numOfEvents: numEvents(m), 
     numOfCoinem: numCoinem(m)}}));
   const [sortType, setSortType] = React.useState("username");
+  const [order, setOrder] = React.useState("ascending");
 
   // Sort array and set data
   function sortArray(array, type){
-    console.log(props.currentUser);
     if (type != "username") {
       // If sorting by number of events or number of coinem and there is a tie, breaks the tie using username
-      const sorted = [...array].sort((a, b) => (b[type] - a[type] !== 0)?  (b[type] - a[type]):(a.username.localeCompare(b.username)));
+      let sorted = [...array].sort((a, b) => (a[type] - b[type] !== 0)?  (a[type] - b[type]):(a.username.localeCompare(b.username)));
+      if (order == "descending"){
+        sorted = sorted.reverse();
+      } 
       setData(sorted); }
     // Sorting by username
     else {
-      setData([...array].sort((a, b) => a.username.localeCompare(b.username)));
+      let sorted = [...array].sort((a, b) => a.username.localeCompare(b.username));
+      if (order == "descending"){
+        sorted = sorted.reverse();
+      } 
+      setData(sorted);
     }
     };
   
@@ -234,8 +245,16 @@ function Members(props){
   // Sort by a new criteria
   useEffect(() => {
       sortArray(memberData, sortType);
-    }, [sortType]);
+    }, [sortType, order]);
 
+  
+  function handleChange(){
+    if(order == "ascending"){
+      setOrder("descending");
+    } else {
+      setOrder("ascending");
+    }
+  };
 
   return(
   <div>
@@ -250,6 +269,19 @@ function Members(props){
               {props.data.length}
             </span>
           </div>
+        </Col>
+        <Col md="auto">
+          <MUFormControl component="fieldset">
+            <FormLabel component="legend">Sorting Order</FormLabel>
+            <RadioGroup row aria-label="order" 
+                        name="row-radio-buttons-group"
+                        value={order}
+                        onChange={() => handleChange()}
+            >
+              <FormControlLabel value="ascending" control={<Radio />} label="Ascending" />
+              <FormControlLabel value="descending" control={<Radio />} label="Descending" />
+            </RadioGroup>
+         </MUFormControl>
         </Col>
         <Col md="auto">
           <Dropdown>
