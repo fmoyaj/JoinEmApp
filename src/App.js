@@ -219,7 +219,7 @@ function Members(props){
       // If sorting by number of events or number of coinem and there is a tie, breaks the tie using username
       let sorted = [...array].sort((a, b) => (a[type] - b[type] !== 0)?  (a[type] - b[type]):(a.username.localeCompare(b.username)));
       if (order == "descending"){
-        sorted = sorted.reverse();
+        sorted = sorted.reverse();  
       } 
       setData(sorted); }
     // Sorting by username
@@ -337,16 +337,100 @@ function Members(props){
 function Events (props) {
   let membersCoinem = props.members.map(member => [member.username, member.coinem]);
 
+  const coinemSpent = (event) => membersCoinem.filter(m => (Object.keys(m[1]).includes((event.uid).toString()))).map(m => m[1][event.uid]).reduce((n,sum) => n+sum, 0);
+  const numMembersInterested = (event) => membersCoinem.filter(m => (Object.keys(m[1]).includes((event.uid).toString()))).length;
+
+  // uid, title, planner, description, numMembersInterested, coinemSpent
+
+  const [eventData, setData] = React.useState(props.data.map((e) => {return {title: e.title, 
+    uid: e.uid, planner: e.planner,
+    description: e.description, numMembersInterested: numMembersInterested(e), 
+    coinemSpent: coinemSpent(e)}}));
+  const [sortType, setSortType] = React.useState("uid");
+  const [order, setOrder] = React.useState("ascending");
+
+  // Sort array and set data
+  function sortArray(array, type){
+    if (type != "title") {
+      // If sorting by number of events or number of coinem and there is a tie, breaks the tie using username
+      let sorted = [...array].sort((a, b) => (a[type] - b[type] !== 0)?  a[type] - b[type]:(a.uid - b.uid));
+      if (order == "descending"){
+        sorted = sorted.reverse();  
+      } 
+      setData(sorted); }
+    // Sorting by title
+    else {
+      let sorted = [...array].sort((a, b) => a.title.localeCompare(b.title));
+      if (order == "descending"){
+        sorted = sorted.reverse();
+      } 
+      setData(sorted);
+    }
+    };
+  
+  // Track changes in props.data due to modification to App's events list global state*/
+  useEffect(() => {
+      let mappedEvents = props.data.map((e) => {return {title: e.title, 
+        uid: e.uid, planner: e.planner,
+        description: e.description, numMembersInterested: numMembersInterested(e), 
+        coinemSpent: coinemSpent(e)}});
+      sortArray(mappedEvents, sortType);
+      
+    }, [props.data]);
+  
+  // Sort by a new criteria
+  useEffect(() => {
+      sortArray(eventData, sortType);
+    }, [sortType, order]);
+
+  
+  function handleChange(){
+    if(order == "ascending"){
+      setOrder("descending");
+    } else {
+      setOrder("ascending");
+    }
+  };
+
+
   return(
   <div>
-    <h3 className="inLineDivs">Events</h3>
-    <span className="inLineDivs">
-      {props.data.length}
-    </span>
-    <Button variant="dark" className="simpleButton">
-      Sort By
-    </Button>
-    {props.data.map(event => (
+    <Container fluid>
+      <Row>
+        <Col md="auto">
+          <h3 className="inLineDivs">Events</h3>
+          <span className="inLineDivs">
+            {props.data.length}
+          </span>
+        </Col>
+        <Col md="auto">
+          <MUFormControl component="fieldset">
+              <FormLabel component="legend">Sorting Order</FormLabel>
+              <RadioGroup row aria-label="order" 
+                          name="row-radio-buttons-group"
+                          value={order}
+                          onChange={() => handleChange()}
+              >
+                <FormControlLabel value="ascending" control={<Radio />} label="Ascending" />
+                <FormControlLabel value="descending" control={<Radio />} label="Descending" />
+              </RadioGroup>
+          </MUFormControl>
+        </Col>
+        <Col md="auto">
+          <Dropdown>
+              <Dropdown.Toggle variant="dark" id="dropdown-basic">
+                Sort by
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                <Dropdown.Item eventKey="uid" onClick={()=> setSortType("uid")}>UID</Dropdown.Item>
+                <Dropdown.Item eventKey="title" onClick={()=> setSortType("title")}>Title</Dropdown.Item>
+                <Dropdown.Item eventKey="coinemSpent" onClick={()=> setSortType("coinemSpent")}>Coinem Spent</Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+        </Col>
+      </Row>
+    </Container>
+    {eventData.map(event => (
       <div class="card">
         <h5 class="card-header" style={{ display: 'flex'}}>
           {event.uid.toString() + ". " + event.title}
@@ -355,7 +439,7 @@ function Events (props) {
                   onClick={() => props.deleteEvent(event.uid)}>
                     Delete
           </Button>
-        </h5>
+        </h5> 
         <div class="card-body">
           <h5 class="card-title">{event.planner}</h5>
           <p class="card-text">{event.description}</p>
@@ -392,45 +476,135 @@ function Stats(props) {
 }
 
 /* Maybe just use conditional rendering for this!*/
-const MemberView = props => (
-  <div>
-    <h3 className="inLineDivs">
-      Members
-    </h3>
-    <span className="inLineDivs">
-      {props.data.length}
-    </span>
-    <Button variant="dark" className="simpleButton">
-      Sort By
-    </Button>
-    <Table striped border hover>
-      <thead>
-        <tr>
-          <th>Username</th>
-          <th>First Name</th>
-          <th>Last Name</th>
-          <th># of Events Planned</th>
-          <th>Events</th>
-          <th>Coinem spent</th>
-          <th>Coinem pairs</th>
+function MemberView(props){
+// Arrow functions to extract the number of events of a member and the number of coinem spent by a member
+let numEvents = (member) => props.events.map(e => e.planner).filter(e => e === member.username).length;
+let numCoinem = (member) => Object.values(member.coinem).reduce((n,sum) => n+sum, 0);
+
+
+const [memberData, setData] = React.useState(props.data.map((m) => {return {username: m.username, 
+  firstname: m.firstname, lastname: m.lastname,
+  coinem: m.coinem, numOfEvents: numEvents(m), 
+  numOfCoinem: numCoinem(m)}}));
+const [sortType, setSortType] = React.useState("username");
+const [order, setOrder] = React.useState("ascending");
+
+// Sort array and set data
+function sortArray(array, type){
+  if (type != "username") {
+    // If sorting by number of events or number of coinem and there is a tie, breaks the tie using username
+    let sorted = [...array].sort((a, b) => (a[type] - b[type] !== 0)?  (a[type] - b[type]):(a.username.localeCompare(b.username)));
+    if (order == "descending"){
+      sorted = sorted.reverse();  
+    } 
+    setData(sorted); }
+  // Sorting by username
+  else {
+    let sorted = [...array].sort((a, b) => a.username.localeCompare(b.username));
+    if (order == "descending"){
+      sorted = sorted.reverse();
+    } 
+    setData(sorted);
+  }
+  };
+
+// Track changes in props.data due to modification to App's members list global state*/
+useEffect(() => {
+    let mappedMembers = props.data.map((m) => {return {username: m.username, 
+      firstname: m.firstname, lastname: m.lastname,
+      coinem: m.coinem, numOfEvents: numEvents(m), 
+      numOfCoinem: numCoinem(m)}});
+    sortArray(mappedMembers, sortType);
+    
+  }, [props.data]);
+
+// Sort by a new criteria
+useEffect(() => {
+    sortArray(memberData, sortType);
+  }, [sortType, order]);
+
+
+function handleChange(){
+  if(order == "ascending"){
+    setOrder("descending");
+  } else {
+    setOrder("ascending");
+  }
+};
+
+return(
+<div>
+  <Container fluid>
+    <Row>
+      <Col md="auto">
+        <div className="headers">
+          <h3 className="inLineDivs">
+            Members
+          </h3>
+          <span className="inLineDivs">
+            {props.data.length}
+          </span>
+        </div>
+      </Col>
+      <Col md="auto">
+        <MUFormControl component="fieldset">
+          <FormLabel component="legend">Sorting Order</FormLabel>
+          <RadioGroup row aria-label="order" 
+                      name="row-radio-buttons-group"
+                      value={order}
+                      onChange={() => handleChange()}
+          >
+            <FormControlLabel value="ascending" control={<Radio />} label="Ascending" />
+            <FormControlLabel value="descending" control={<Radio />} label="Descending" />
+          </RadioGroup>
+       </MUFormControl>
+      </Col>
+      <Col md="auto">
+        <Dropdown>
+          <Dropdown.Toggle variant="dark" id="dropdown-basic">
+            Sort by
+          </Dropdown.Toggle>
+          <Dropdown.Menu>
+            <Dropdown.Item eventKey="username" onClick={()=> setSortType("username")}>Username</Dropdown.Item>
+            <Dropdown.Item eventKey="numOfEvents" onClick={()=> setSortType("numOfEvents")}>Number of Events Planned</Dropdown.Item>
+            <Dropdown.Item eventKey="numOfCoinem" onClick={()=> setSortType("numOfCoinem")}>Number of Coinem Spent</Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
+      </Col>
+    </Row>
+  </Container>
+  <Table striped border hover>
+    <thead>
+      <tr>
+        <th>Username</th>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th># of Events Planned</th>
+        <th>Events</th>
+        <th>Coinem spent</th>
+        <th>Coinem pairs</th>
+      </tr>
+    </thead>
+    <tbody>
+      {memberData.map(member => (
+        <tr key={member.username}>
+          <td>{member.username}</td>
+          <td>{member.firstname}</td>
+          <td>{member.lastname}</td>
+          <td>{member.numOfEvents}</td>
+          <td>{props.events.filter(e => e.planner === member.username).map(e => e.uid).join(', ')}</td>
+          <td>{member.numOfCoinem}</td>
+          <td>{Object.entries(member.coinem).map(c => '('+c[0]+','+c[1].toString()+')').join(', ')}</td>
+          <td><Button variant="outline-secondary" size="sm" onClick={() => props.deleteMember(member.username)}>
+                Delete
+              </Button>
+          </td>
         </tr>
-      </thead>
-      <tbody>
-        {props.data.map(member => (
-          <tr key={member.username}>
-            <td>{member.username}</td>
-            <td>{member.firstname}</td>
-            <td>{member.lastname}</td>
-            <td>{props.events.map(e => e.planner).filter(e => e === member.username).length}</td>
-            <td>{props.events.filter(e => e.planner === member.username).map(e => e.uid).join(', ')}</td>
-            <td>{Object.values(member.coinem).reduce((n,sum) => n+sum, 0)}</td>
-            <td>{Object.entries(member.coinem).map(c => '('+c[0]+','+c[1].toString()+')').join(', ')}</td>
-          </tr>
-        ))}
-      </tbody>
-    </Table>
-  </div>
-)
+      ))}
+    </tbody>
+  </Table>
+</div>);
+}
 
 // Create a new event or edit existing event
 function ModifyEvent(props) {
@@ -607,17 +781,104 @@ function DisplayEvent(props){
 }
 
 function MemberEvents (props) {
+  let membersCoinem = props.members.map(member => [member.username, member.coinem]);
+
+  const coinemSpent = (event) => membersCoinem.filter(m => (Object.keys(m[1]).includes((event.uid).toString()))).map(m => m[1][event.uid]).reduce((n,sum) => n+sum, 0);
+  const numMembersInterested = (event) => membersCoinem.filter(m => (Object.keys(m[1]).includes((event.uid).toString()))).length;
+
+  // uid, title, planner, description, numMembersInterested, coinemSpent
+
+  const [eventData, setData] = React.useState(props.data.map((e) => {return {title: e.title, 
+    uid: e.uid, planner: e.planner,
+    description: e.description, numMembersInterested: numMembersInterested(e), 
+    coinemSpent: coinemSpent(e)}}));
+  const [sortType, setSortType] = React.useState("uid");
+  const [order, setOrder] = React.useState("ascending");
+
+  // Sort array and set data
+  function sortArray(array, type){
+    if (type != "title") {
+      // If sorting by number of events or number of coinem and there is a tie, breaks the tie using username
+      let sorted = [...array].sort((a, b) => (a[type] - b[type] !== 0)?  a[type] - b[type]:(a.uid - b.uid));
+      if (order == "descending"){
+        sorted = sorted.reverse();  
+      } 
+      setData(sorted); }
+    // Sorting by title
+    else {
+      let sorted = [...array].sort((a, b) => a.title.localeCompare(b.title));
+      if (order == "descending"){
+        sorted = sorted.reverse();
+      } 
+      setData(sorted);
+    }
+    };
+  
+  // Track changes in props.data due to modification to App's events list global state*/
+  useEffect(() => {
+      let mappedEvents = props.data.map((e) => {return {title: e.title, 
+        uid: e.uid, planner: e.planner,
+        description: e.description, numMembersInterested: numMembersInterested(e), 
+        coinemSpent: coinemSpent(e)}});
+      sortArray(mappedEvents, sortType);
+      
+    }, [props.data]);
+  
+  // Sort by a new criteria
+  useEffect(() => {
+      sortArray(eventData, sortType);
+    }, [sortType, order]);
+
+  
+  function handleChange(){
+    if(order == "ascending"){
+      setOrder("descending");
+    } else {
+      setOrder("ascending");
+    }
+  };
+
   return(
   <div>
-    <h3 className="inLineDivs">Events</h3>
-    <span className="inLineDivs">
-      {props.data.length}
-    </span>
-    <Button variant="dark" className="simpleButton">
-      Sort By
-    </Button>
-    <ModifyEvent events={props.data} handleNewEvent={props.handleNewEvent} currentUser={props.currentUser} MAX_EVENTS={props.MAX_EVENTS} deleteEvent={props.deleteEvent} initialTitle={""} initialDescription={""} buttonTitle={"New Event"} newEvent={true}></ModifyEvent>
-    {props.data.map(e => (
+    <Container fluid>
+      <Row>
+        <Col md="auto">
+          <h3 className="inLineDivs">Events</h3>
+          <span className="inLineDivs">
+            {props.data.length}
+          </span>
+        </Col>
+        <Col md="auto">
+          <MUFormControl component="fieldset">
+                    <FormLabel component="legend">Sorting Order</FormLabel>
+                    <RadioGroup row aria-label="order" 
+                                name="row-radio-buttons-group"
+                                value={order}
+                                onChange={() => handleChange()}
+                    >
+                      <FormControlLabel value="ascending" control={<Radio />} label="Ascending" />
+                      <FormControlLabel value="descending" control={<Radio />} label="Descending" />
+                    </RadioGroup>
+          </MUFormControl>
+        </Col>
+        <Col md="auto">
+          <Dropdown>
+              <Dropdown.Toggle variant="dark" id="dropdown-basic">
+                Sort by
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                <Dropdown.Item eventKey="uid" onClick={()=> setSortType("uid")}>UID</Dropdown.Item>
+                <Dropdown.Item eventKey="title" onClick={()=> setSortType("title")}>Title</Dropdown.Item>
+                <Dropdown.Item eventKey="coinemSpent" onClick={()=> setSortType("coinemSpent")}>Coinem Spent</Dropdown.Item>
+              </Dropdown.Menu>
+          </Dropdown>
+        </Col>
+        <Col md="auto">
+        <ModifyEvent events={props.data} handleNewEvent={props.handleNewEvent} currentUser={props.currentUser} MAX_EVENTS={props.MAX_EVENTS} deleteEvent={props.deleteEvent} initialTitle={""} initialDescription={""} buttonTitle={"New Event"} newEvent={true}></ModifyEvent>
+        </Col>
+      </Row>
+    </Container>
+    {eventData.map(e => (
       <DisplayEvent event = {e} members={props.members} currentUser={props.currentUser} deleteEvent={props.deleteEvent} toggleCoinemSpent={props.toggleCoinemSpent} events={props.data} handleNewEvent={props.handleNewEvent} handleEditEvent={props.handleEditEvent} MAX_EVENTS={props.MAX_EVENTS}></DisplayEvent>
     ))}
   </div> )
@@ -731,9 +992,8 @@ class App extends React.Component{
                       {
                           obj[key] = m.coinem[key];
                           return obj;
-                      }, {}
+                      }, {} // Turns coinem list into an object -- acts like .fromEntries
                   )}})});
-    console.log(this.state.members);
   }
 
   downloadHandler (event) {
