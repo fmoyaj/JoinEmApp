@@ -70,9 +70,10 @@
   flex-direction: row;
 }
 
-.simpleButton{
-  background-color: black;
-  color: white;
+.headers {
+  text-align: center;
+  vertical-align: middle;
+  line-height: 10px;
 }
 
 header{

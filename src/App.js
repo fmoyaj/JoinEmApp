@@ -6,13 +6,13 @@ import Button from 'react-bootstrap/Button';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Popover from 'react-bootstrap/Popover';
 import { Navbar } from 'react-bootstrap';
-import { Container, Alert, Accordion, InputGroup, FormControl} from 'react-bootstrap';
+import { Container, Alert, Accordion, InputGroup, FormControl, Row, Col} from 'react-bootstrap';
 import {Dropdown} from 'react-bootstrap';
 import { Nav } from 'react-bootstrap';
 import editing from './icons/editing.png';
 import coinem from './icons/coinem_icon.png'
 import { Modal } from 'react-bootstrap';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import MaterialButton from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 
@@ -198,18 +198,76 @@ function Globals(props){
   </div>);
 }
 
-const Members = props => (
+function Members(props){
+  let numEvents = (member) => props.events.map(e => e.planner).filter(e => e === member.username).length;
+  let numCoinem = (member) => Object.values(member.coinem).reduce((n,sum) => n+sum, 0);
+
+  const [memberData, setData] = React.useState(props.data.map((m) => {return {username: m.username, 
+    firstname: m.firstname, lastname: m.lastname,
+    coinem: m.coinem, numOfEvents: numEvents(m), 
+    numOfCoinem: numCoinem(m)}}));
+  const [sortType, setSortType] = React.useState("username");
+
+  // Sort array and set data
+  function sortArray(array, type){
+    console.log(props.currentUser);
+    if (type != "username") {
+      // If sorting by number of events or number of coinem and there is a tie, breaks the tie using username
+      const sorted = [...array].sort((a, b) => (b[type] - a[type] !== 0)?  (b[type] - a[type]):(a.username.localeCompare(b.username)));
+      setData(sorted); }
+    // Sorting by username
+    else {
+      setData([...array].sort((a, b) => a.username.localeCompare(b.username)));
+    }
+    };
+  
+  // Track changes in props.data due to modification to App's members list global state*/
+  useEffect(() => {
+      let mappedMembers = props.data.map((m) => {return {username: m.username, 
+        firstname: m.firstname, lastname: m.lastname,
+        coinem: m.coinem, numOfEvents: numEvents(m), 
+        numOfCoinem: numCoinem(m)}});
+      sortArray(mappedMembers, sortType);
+      
+    }, [props.data]);
+  
+  // Sort by a new criteria
+  useEffect(() => {
+      sortArray(memberData, sortType);
+    }, [sortType]);
+
+
+  return(
   <div>
-    <h3 className="inLineDivs">
-      Members
-    </h3>
-    <span className="inLineDivs">
-      {props.data.length}
-    </span>
-    <Button variant="dark" className="simpleButton">
-      Sort By
-    </Button>
-    <AddMember submit={props.submit} members={props.data}></AddMember>
+    <Container fluid>
+      <Row>
+        <Col md="auto">
+          <div className="headers">
+            <h3 className="inLineDivs">
+              Members
+            </h3>
+            <span className="inLineDivs">
+              {props.data.length}
+            </span>
+          </div>
+        </Col>
+        <Col md="auto">
+          <Dropdown>
+            <Dropdown.Toggle variant="dark" id="dropdown-basic">
+              Sort by
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+              <Dropdown.Item eventKey="username" onClick={()=> setSortType("username")}>Username</Dropdown.Item>
+              <Dropdown.Item eventKey="numOfEvents" onClick={()=> setSortType("numOfEvents")}>Number of Events Planned</Dropdown.Item>
+              <Dropdown.Item eventKey="numOfCoinem" onClick={()=> setSortType("numOfCoinem")}>Number of Coinem Spent</Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+        </Col>
+        <Col md="auto">
+          <AddMember submit={props.submit} members={props.data}></AddMember>
+         </Col>
+      </Row>
+    </Container>
     <Table striped border hover>
       <thead>
         <tr>
@@ -223,14 +281,14 @@ const Members = props => (
         </tr>
       </thead>
       <tbody>
-        {props.data.map(member => (
+        {memberData.map(member => (
           <tr key={member.username}>
             <td>{member.username}</td>
             <td>{member.firstname}</td>
             <td>{member.lastname}</td>
-            <td>{props.events.map(e => e.planner).filter(e => e === member.username).length}</td>
+            <td>{member.numOfEvents}</td>
             <td>{props.events.filter(e => e.planner === member.username).map(e => e.uid).join(', ')}</td>
-            <td>{Object.values(member.coinem).reduce((n,sum) => n+sum, 0)}</td>
+            <td>{member.numOfCoinem}</td>
             <td>{Object.entries(member.coinem).map(c => '('+c[0]+','+c[1].toString()+')').join(', ')}</td>
             <td><Button variant="outline-secondary" size="sm" onClick={() => props.deleteMember(member.username)}>
                   Delete
@@ -240,8 +298,9 @@ const Members = props => (
         ))}
       </tbody>
     </Table>
-  </div>
-)
+  </div>);
+}
+
 
 function Events (props) {
   let membersCoinem = props.members.map(member => [member.username, member.coinem]);
@@ -348,6 +407,8 @@ function ModifyEvent(props) {
   const [currentDescription, setCurrentDescription] = useState(props.initialDescription);
   const [newEvent, setNewEvent] = useState(props.newEvent);
   let memberEvents = props.events.map(e => e.planner).filter(e => e === props.currentUser);
+  let style = newEvent? "dark":"outline-secondary";
+  let size = newEvent? "":"sm";
 
   function handleClose() {
     setShow(false);
@@ -382,7 +443,7 @@ function ModifyEvent(props) {
 
   return (
     <>
-      <Button variant="dark" onClick={handleOpen}>
+      <Button variant={style} size={size} onClick={handleOpen}>
         {props.buttonTitle}
       </Button>
       <Modal show={show} onHide={handleClose}>
@@ -463,7 +524,10 @@ function DisplayEvent(props){
               {/*event = {e} members={props.members} currentUser={props.currentUser} deleteEvent={props.deleteEvent} toggleCoinemSpent={props.toggleCoinemSpent}
                 modifyEvent -> events={props.data} handleNewEvent={props.handleNewEvent} currentUser={props.currentUser} MAX_EVENTS={props.MAX_EVENTS} deleteEvent={props.deleteEvent} initialTitle={""} initialDescription={""} buttonTitle={"New Event"}
               */}
-              <ModifyEvent events={props.events} handleEditEvent={props.handleEditEvent} handleNewEvent={props.handleNewEvent} currentUser={props.currentUser} MAX_EVENTS={props.MAX_EVENTS} deleteEvent={props.deleteEvent} initialTitle={props.event.title} initialDescription={props.event.description} initialUid={props.event.uid} buttonTitle={"Edit"} newEvent={false}></ModifyEvent>
+              <ModifyEvent events={props.events} handleEditEvent={props.handleEditEvent} handleNewEvent={props.handleNewEvent} 
+                            currentUser={props.currentUser} MAX_EVENTS={props.MAX_EVENTS} deleteEvent={props.deleteEvent} 
+                            initialTitle={props.event.title} initialDescription={props.event.description} 
+                            initialUid={props.event.uid} buttonTitle={"Edit"} newEvent={false}></ModifyEvent>
               <Button variant="outline-secondary" size="sm" 
                       style={{ marginLeft: "auto" }}
                       onClick={() => props.deleteEvent(props.event.uid)}>
@@ -542,13 +606,12 @@ function MemberEvents (props) {
   
     return (
       <>
-        <Button variant="danger" onClick={handleOpen}>
-          Delete Account
-        </Button>
+        <div style={{display: 'flex', justifyContent: 'center'}}>
+          <Button variant="danger"onClick={handleOpen}>
+            Delete Account
+          </Button>
+        </div>
         <Modal show={show} onHide={handleClose}>
-          <Modal.Header>
-            <Modal.Title>{props.buttonTitle}</Modal.Title>
-          </Modal.Header>
           <Modal.Body>
             Are you sure you would like to delete your account? This action cannot be reversed.
           </Modal.Body>
@@ -557,7 +620,7 @@ function MemberEvents (props) {
               Cancel
             </Button>
             <Button variant="danger" onClick={() => {props.deleteMember(props.currentUser); handleConfirm()}}>
-              Confirm
+              Delete
             </Button>
           </Modal.Footer>
         </Modal>
@@ -581,8 +644,6 @@ class App extends React.Component{
       fileDownloadUrl: null,
       fileInfo: "",
       currentUser: "admin", // Stores if interface is in admin mode or member mode
-      show: false,
-      tempGlobalInfo: "",
     } 
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleNewUser = this.handleNewUser.bind(this);
@@ -727,7 +788,6 @@ class App extends React.Component{
 
   becomeMember(name){
     this.setState({currentUser: name});
-    console.log(this.state.currentUser);
   }
 
   /* Member-specific methods */
@@ -801,7 +861,7 @@ class App extends React.Component{
                     </Dropdown.Toggle>
                     <Dropdown.Menu style={{ maxHeight: "200px", overflowY: "auto"}}>
                       <Dropdown.Item onClick={()=> this.becomeMember("admin")}>admin</Dropdown.Item>
-                      {this.state.members.map(m =>
+                      {sortStringList(this.state.members, "username").map(m =>
                         <Dropdown.Item eventKey={m.username} onClick={()=> this.becomeMember(m.username)}>{m.username}</Dropdown.Item>
                         )}
                     </Dropdown.Menu>
@@ -833,7 +893,8 @@ class App extends React.Component{
                         newMember={this.state.newMember} 
                         handleInputChange={this.handleInputChange}
                         submit={this.handleNewUser}
-                        deleteMember={this.deleteMember}>
+                        deleteMember={this.deleteMember}
+                        currentUser={this.state.currentUser}>
               </Members>
               </ErrorBoundary>
               <Events data={this.state.events} 
@@ -877,7 +938,7 @@ class App extends React.Component{
                   domElt => this.domFileDownload = domElt
                 }
               >download it</a>
-              <pre className="status" className="hidden">{this.state.fileInfo}</pre>
+              <pre className="hidden">{this.state.fileInfo}</pre>
             </div> 
           }
         {this.state.currentUser !== "admin" &&
@@ -907,7 +968,10 @@ class App extends React.Component{
                     MAX_EVENTS={this.state.MAX_EVENTS}
                     handleEditEvent={this.handleEditEvent}>
           </MemberEvents>
-          <DeleteAccount deleteMember={this.deleteMember} currentUser = {this.state.currentUser}></DeleteAccount>
+          <DeleteAccount 
+                    deleteMember={this.deleteMember} 
+                    currentUser = {this.state.currentUser}>
+          </DeleteAccount>
         </div>
         }
       </div>
@@ -944,6 +1008,12 @@ class App extends React.Component{
     }
     return this.props.children; 
   }
+}
+
+/*Sorts strings by some given criteria and returns a sorted list in ascending order. Takes in a list of strings and a criteria
+as a string*/
+function sortStringList(list, criteria){
+  return [...list].sort((a, b) => a[criteria] < b[criteria] ? -1 : 1 );
 }
 
 
