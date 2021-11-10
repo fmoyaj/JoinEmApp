@@ -182,6 +182,10 @@ class App extends React.Component{
       if(newTitle === "" || newDescription === ""){
         alert("Please fill out all text fields before submitting!");  
       }
+      else if(memberEvents.length === this.state.MAX_EVENTS){
+        alert("You have reached the maximum number of events you can plan." +  
+        " Cannot plan a new event until another event has been deleted.");  
+      }
       // User chooses non-unique title
       else {
         alert("Event title already taken. Please choose a unique title for your event.")

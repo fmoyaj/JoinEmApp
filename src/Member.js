@@ -196,10 +196,11 @@ export function Stats(props) {
       if (currentTitle !== "" && currentDescription !== ""){
         setShow(false);
         // If this event title has been used, prompt user to enter new title
-        if(newEvent && memberEvents.length < props.MAX_EVENTS
-          && !props.events.map( e => e.title).includes(currentTitle))
+        if((newEvent && memberEvents.length < props.MAX_EVENTS
+          && !props.events.map( e => e.title).includes(currentTitle)) || 
+          (newEvent && memberEvents.length == props.MAX_EVENTS)) {
             setCurrentTitle("");
-            setCurrentDescription("");
+            setCurrentDescription(""); }
       }
     }
 
