@@ -1,14 +1,7 @@
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React from 'react';
-import Table from 'react-bootstrap/Table';
-import Button from 'react-bootstrap/Button';
-import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
-import Popover from 'react-bootstrap/Popover';
-import { Navbar } from 'react-bootstrap';
-import { Container, Alert, Accordion, InputGroup, FormControl, Row, Col} from 'react-bootstrap';
-import {Dropdown} from 'react-bootstrap';
-import { Nav } from 'react-bootstrap';
+import { Container, Accordion, Button, Navbar, Nav, Dropdown} from 'react-bootstrap';
 import { Globals, Members, Events } from './Admin.js';
 import { Stats, MemberView, MemberEvents, DeleteAccount } from './Member.js';
 
@@ -54,7 +47,10 @@ class App extends React.Component{
       case "lastName":
         this.setState({newMember: {...this.state.newMember, lastname: e.target.value}});
         break;
+
+      // No default
     }
+
   }
 
   handleNewUser(newUsername, newName, newLastname){
@@ -127,6 +123,7 @@ class App extends React.Component{
           this.setState({MAX_COINEM: newGlobalValue});
         }
         break;
+      // No default
     }
   }
 
@@ -193,8 +190,8 @@ class App extends React.Component{
   }
 
   handleEditEvent(title, description, currentUid){
-    let index = this.state.events.indexOf(this.state.events.filter(e => e.uid == currentUid)[0]);
-    let updatedEvents = this.state.events.filter(e => e.uid != currentUid);
+    let index = this.state.events.indexOf(this.state.events.filter(e => e.uid === currentUid)[0]);
+    let updatedEvents = this.state.events.filter(e => e.uid !== currentUid);
     updatedEvents.splice(index, 0, {uid: currentUid, title: title, description: description, planner: this.state.currentUser});
     if(title !== "" && description !== "") {
         this.setState({events: updatedEvents});
@@ -210,17 +207,20 @@ class App extends React.Component{
 
   toggleCoinemSpent(currentCoinemSpent, operation, uid){
     let currentUserInfo = this.state.members.filter(member => member.username===this.state.currentUser)[0]
-    let currentCoinem = currentUserInfo.coinem[uid] == undefined? 0:currentUserInfo.coinem[uid];
+    let coinemSpentAllEvents = Object.values(currentUserInfo.coinem).reduce((n, sum) => n + sum, 0);
+    let currentCoinem = currentUserInfo.coinem[uid] === undefined? 0:currentUserInfo.coinem[uid];
 
     if (currentCoinemSpent <= this.state.MAX_COINEM_PER_EVENT) {
       // Addition
-      if(operation === "increase" && currentCoinemSpent < this.state.MAX_COINEM_PER_EVENT) {
+      if(operation === "increase" && currentCoinemSpent < this.state.MAX_COINEM_PER_EVENT 
+          && coinemSpentAllEvents < this.state.MAX_COINEM
+          ) {
         let newValue = currentCoinem  + 1;
         let newCoinem = {...currentUserInfo.coinem, [uid]: newValue};
         this.setState({members:[...this.state.members.filter(member => member.username!==this.state.currentUser), {...currentUserInfo, coinem: newCoinem}]});
       }
       // Substraction
-      if(operation === "reduce" && currentCoinemSpent>0){
+      if(operation === "reduce" && currentCoinemSpent>0 && coinemSpentAllEvents > 0){
         let newValue = currentCoinem - 1;
         let newCoinem = {...currentUserInfo.coinem, [uid]: newValue};
         this.setState({members:[...this.state.members.filter(member => member.username!==this.state.currentUser), {...currentUserInfo, coinem: newCoinem}]});
@@ -252,7 +252,7 @@ class App extends React.Component{
               </Navbar.Collapse>
             </Container>
           </Navbar>
-          { this.state.currentUser == "admin" &&
+          { this.state.currentUser === "admin" &&
             <div>
               <div>
                 <ErrorBoundary>

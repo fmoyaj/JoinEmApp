@@ -24,7 +24,6 @@ import MUFormControl from '@material-ui/core/FormControl';
    member has left to spend*/
 export function Stats(props) {
     let member = props.members.filter(m => m.username === props.user)[0];
-    console.log(props.maxCoinem);
     return(
     <div>
       <span className="dashboardElem">
@@ -57,17 +56,17 @@ export function Stats(props) {
   
   // Sort array and set data
   function sortArray(array, type){
-    if (type != "username") {
+    if (type !== "username") {
       // If sorting by number of events or number of coinem and there is a tie, breaks the tie using username
       let sorted = [...array].sort((a, b) => (a[type] - b[type] !== 0)?  (a[type] - b[type]):(a.username.localeCompare(b.username)));
-      if (order == "descending"){
+      if (order === "descending"){
         sorted = sorted.reverse(); // Reverse sorted list to give descending order
       } 
       setData(sorted); }
     // Sorting by username
     else {
       let sorted = [...array].sort((a, b) => a.username.localeCompare(b.username));
-      if (order == "descending"){
+      if (order === "descending"){
         sorted = sorted.reverse(); // Reverse sorted list to give descending order
       } 
       setData(sorted);
@@ -92,7 +91,7 @@ export function Stats(props) {
   
   // Helper function changing order (hook state variable)
   function handleChange(){
-    if(order == "ascending"){
+    if(order === "ascending"){
       setOrder("descending");
     } else {
       setOrder("ascending");
@@ -217,6 +216,8 @@ export function Stats(props) {
         case "description":
           setCurrentDescription(target.value);
           break;
+
+        // No default
       }
     }
   
@@ -276,14 +277,14 @@ export function Stats(props) {
     let membersCoinem = props.members.map(member => [member.username, member.coinem]);
     let currentCoinemSpent = 0;
     // Calculate all coinem spent by members in an event
-    if (props.members.filter(member => member.username===props.currentUser)[0].coinem[props.event.uid] == undefined) {
+    if (props.members.filter(member => member.username===props.currentUser)[0].coinem[props.event.uid] === undefined) {
       currentCoinemSpent = 0;
     } else {
       currentCoinemSpent = props.members.filter(member => member.username===props.currentUser)[0].coinem[props.event.uid]
     }
     
     return (<div>
-      {props.event.planner == props.currentUser && 
+      {props.event.planner === props.currentUser && 
       <div class="card">
           <h5 class="card-header" style={{ display: 'flex'}}>
             {props.event.uid.toString() + ". " + props.event.title}
@@ -374,17 +375,17 @@ export function Stats(props) {
   
     // Sort array and set data
     function sortArray(array, type){
-      if (type != "title") {
+      if (type !== "title") {
         // If sorting by number of events or number of coinem and there is a tie, breaks the tie using username
         let sorted = [...array].sort((a, b) => (a[type] - b[type] !== 0)?  a[type] - b[type]:(a.uid - b.uid));
-        if (order == "descending"){
+        if (order === "descending"){
           sorted = sorted.reverse(); // Reverse order if sorting order is descending
         } 
         setData(sorted); }
       // Sorting by title
       else {
         let sorted = [...array].sort((a, b) => a.title.localeCompare(b.title));
-        if (order == "descending"){
+        if (order === "descending"){
           sorted = sorted.reverse(); // Reverse order if sorting order is descending
         } 
         setData(sorted);
@@ -410,7 +411,7 @@ export function Stats(props) {
     
     // Updates order
     function handleChange(){
-      if(order == "ascending"){
+      if(order === "ascending"){
         setOrder("descending");
       } else {
         setOrder("ascending");

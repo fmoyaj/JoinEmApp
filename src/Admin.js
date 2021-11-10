@@ -151,6 +151,8 @@ export function AddMember(props) {
           setCurrentLastName(target.value);
           break;
       }
+
+      // no default
     }
   
     return (
@@ -223,17 +225,17 @@ export function Members(props){
   
     // Sort array and set data
     function sortArray(array, type){
-        if (type != "username") {
+        if (type !== "username") {
             // If sorting by number of events or number of coinem and there is a tie, breaks the tie using username
             let sorted = [...array].sort((a, b) => (a[type] - b[type] !== 0)?  (a[type] - b[type]):(a.username.localeCompare(b.username)));
-            if (order == "descending"){
+            if (order === "descending"){
             sorted = sorted.reverse();  
             } 
             setData(sorted); }
         // Sorting by username
         else {
             let sorted = [...array].sort((a, b) => a.username.localeCompare(b.username));
-            if (order == "descending"){
+            if (order === "descending"){
             sorted = sorted.reverse();
             } 
             setData(sorted);
@@ -256,7 +258,7 @@ export function Members(props){
 
 
     function handleChange(){
-        if(order == "ascending"){
+        if(order === "ascending"){
             setOrder("descending");
         } else {
             setOrder("ascending");
@@ -359,17 +361,17 @@ export function Events (props) {
   
     // Sort array and set data
     function sortArray(array, type){
-        if (type != "title") {
+        if (type !== "title") {
             // If sorting by number of events or number of coinem and there is a tie, breaks the tie using username
             let sorted = [...array].sort((a, b) => (a[type] - b[type] !== 0)?  a[type] - b[type]:(a.uid - b.uid));
-            if (order == "descending") {
+            if (order === "descending") {
                 sorted = sorted.reverse();  
             } 
             setData(sorted); }
         // Sorting by title
         else {
             let sorted = [...array].sort((a, b) => a.title.localeCompare(b.title));
-            if (order == "descending") {
+            if (order === "descending") {
                 sorted = sorted.reverse();
             } 
             setData(sorted);
@@ -392,7 +394,7 @@ export function Events (props) {
   
     
     function handleChange(){
-        if(order == "ascending"){
+        if(order === "ascending"){
             setOrder("descending");
         } else {
             setOrder("ascending");
