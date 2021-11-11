@@ -1,9 +1,12 @@
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React from 'react';
-import { Container, Accordion, Button, Navbar, Nav, Dropdown} from 'react-bootstrap';
+import { Container, Accordion, Button, Navbar, Nav, Dropdown, Row, Col} from 'react-bootstrap';
 import { Globals, Members, Events } from './Admin.js';
 import { Stats, MemberView, MemberEvents, DeleteAccount } from './Member.js';
+import upload from './icons/upload.png';
+import download from './icons/download.png';
+import {Card, CardContent, Typography, Grid} from '@material-ui/core';
 
 
 class App extends React.Component{
@@ -184,7 +187,7 @@ class App extends React.Component{
       }
       else if(memberEvents.length === this.state.MAX_EVENTS){
         alert("You have reached the maximum number of events you can plan." +  
-        " Cannot plan a new event until another event has been deleted.");  
+        " You cannot plan a new event until another event has been deleted.");  
       }
       // User chooses non-unique title
       else {
@@ -257,75 +260,82 @@ class App extends React.Component{
             </Container>
           </Navbar>
           { this.state.currentUser === "admin" &&
-            <div>
+            <Container fluid>
               <div>
-                <ErrorBoundary>
-                <Button onClick={this.downloadHandler}>Download file</Button>
-                </ErrorBoundary>
-                <Button onClick={this.uploadHandler}>Upload file</Button>
-              </div>
-              <Globals maxEvents={this.state.MAX_EVENTS}
-                      maxCoinem={this.state.MAX_COINEM}
-                      maxCoinemEvent={this.state.MAX_COINEM_PER_EVENT}
-                      nextUID ={this.state.NEXT_EVENT_UID}
-                      handleSaveChanges={this.handleSaveChanges}
-                      events={this.state.events}
-                      members={this.state.members}
-                      >
-              </Globals>
-              <ErrorBoundary>
-              <Members data={this.state.members} 
+                  <Row>
+                      <Card sx={{ maxWidth: 345 }}>
+                        <CardContent>
+                            <Typography gutterBottom variant="h6" component="div">
+                              Database Management
+                            </Typography>
+                            <Grid container spacing={2}>
+                              <Grid item xs={2}>
+                                  <Button className="btn btn-light" onClick={this.downloadHandler}>
+                                    <img src={download} className="icons"/>
+                                    {"   Download file"}
+                                  </Button>
+                              </Grid>
+                              <Grid item xs={2}>
+                                <Button className="btn btn-light" onClick={this.uploadHandler}>
+                                <img src={upload} className="icons"/>
+                                {" Upload file"}
+                                </Button>
+                              </Grid>
+                            </Grid>
+                        </CardContent>
+                      </Card>
+                  </Row>
+                <Globals maxEvents={this.state.MAX_EVENTS}
+                        maxCoinem={this.state.MAX_COINEM}
+                        maxCoinemEvent={this.state.MAX_COINEM_PER_EVENT}
+                        nextUID ={this.state.NEXT_EVENT_UID}
+                        handleSaveChanges={this.handleSaveChanges}
                         events={this.state.events}
-                        newMember={this.state.newMember} 
-                        handleInputChange={this.handleInputChange}
-                        submit={this.handleNewUser}
-                        deleteMember={this.deleteMember}
-                        currentUser={this.state.currentUser}>
-              </Members>
-              </ErrorBoundary>
-              <Events data={this.state.events} 
-                      members={this.state.members}
-                      deleteEvent={this.deleteEvent}>
-              </Events>
-            
-              <input type="file"
-                className="hidden"                                                                   
-                multiple={false}
-                accept=".json, application/json" // Only upload JSON files                              
-                onChange={evt => this.openFileHandler(evt)}
-                ref={
-                  // This is so-called "callback ref" that captures the associated
-                  // DOM element on rendering.
-                  // See https://reactjs.org/docs/refs-and-the-dom.html 
-                  domElt => this.domFileUpload = domElt
-                }
-              />
-            
-              {/* <input type="file"
-                className="hidden"                                                                   
-                multiple={false}
-                accept=".json, application/json" // Only upload JSON files                              
-                onChange={evt => this.openFileHandler(evt)}
-                ref={
-                  // This is so-called "callback ref" that captures the associated
-                  // DOM element on rendering.
-                  // See https://reactjs.org/docs/refs-and-the-dom.html 
-                  domElt => this.domFileUpload = domElt
-                }
-              /> */}
+                        members={this.state.members}
+                        >
+                </Globals>
+                <ErrorBoundary>
+                <Members data={this.state.members} 
+                          events={this.state.events}
+                          newMember={this.state.newMember} 
+                          handleInputChange={this.handleInputChange}
+                          submit={this.handleNewUser}
+                          deleteMember={this.deleteMember}
+                          currentUser={this.state.currentUser}>
+                </Members>
+                </ErrorBoundary>
+                <Events data={this.state.events} 
+                        members={this.state.members}
+                        deleteEvent={this.deleteEvent}>
+                </Events>
+              
+                <input type="file"
+                  className="hidden"                                                                   
+                  multiple={false}
+                  accept=".json, application/json" // Only upload JSON files                              
+                  onChange={evt => this.openFileHandler(evt)}
+                  ref={
+                    // This is so-called "callback ref" that captures the associated
+                    // DOM element on rendering.
+                    // See https://reactjs.org/docs/refs-and-the-dom.html 
+                    domElt => this.domFileUpload = domElt
+                  }
+                />
 
-              <a className="hidden" 
-                download="joinemData.json" // download attribute specifies file name                                        // to download to when clicking link 
-                href={this.state.fileDownloadUrl}
-                ref={
-                  // This is so-called "callback ref" that captures the associated 
-                  // DOM element on rendering.
-                  // See https://reactjs.org/docs/refs-and-the-dom.html
-                  domElt => this.domFileDownload = domElt
-                }
-              >download it</a>
-              <pre className="hidden">{this.state.fileInfo}</pre>
-            </div> 
+
+                <a className="hidden" 
+                  download="joinemData.json" // download attribute specifies file name                                        // to download to when clicking link 
+                  href={this.state.fileDownloadUrl}
+                  ref={
+                    // This is so-called "callback ref" that captures the associated 
+                    // DOM element on rendering.
+                    // See https://reactjs.org/docs/refs-and-the-dom.html
+                    domElt => this.domFileDownload = domElt
+                  }
+                >download it</a>
+                <pre className="hidden">{this.state.fileInfo}</pre>
+              </div> 
+            </Container>
           }
         {this.state.currentUser !== "admin" &&
         <div>
