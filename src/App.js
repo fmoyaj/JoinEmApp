@@ -272,7 +272,7 @@ class App extends React.Component{
                               <Grid item xs={2}>
                                   <Button className="btn btn-light" onClick={this.downloadHandler}>
                                     <img src={download} className="icons"/>
-                                    {"   Download file"}
+                                    {" Download file"}
                                   </Button>
                               </Grid>
                               <Grid item xs={2}>

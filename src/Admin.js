@@ -11,8 +11,9 @@ import editing from './icons/editing.png';
 import coinem from './icons/coinem_icon.png'
 import { Modal } from 'react-bootstrap';
 import { useState, useEffect } from 'react';
-import {RadioGroup, Radio, FormLabel, FormControlLabel} from '@material-ui/core';
+import {RadioGroup, Radio, FormLabel, FormControlLabel, IconButton} from '@material-ui/core';
 import MUFormControl from '@material-ui/core/FormControl';
+import EditIcon from '@mui/icons-material/Edit';
 
 
 // 'export' in front of the functions will allow the functions to be imported in other files, like App.js
@@ -77,9 +78,9 @@ export function EditGlobals(props) {
   
     return (
       <>
-        <Button variant="light" onClick={handleOpen}>
-              <img src={editing} width="16" height="16"/>
-              </Button>
+        <IconButton aria-label="edit" onClick={handleOpen} >
+            <EditIcon />
+        </IconButton>
   
         <Modal show={show} onHide={handleClose}>
             <Modal.Header>
@@ -280,17 +281,21 @@ export function Members(props){
                     </div>
                 </Col>
                 <Col md="auto">
-                    <MUFormControl component="fieldset">
-                    <FormLabel component="legend">Sorting Order</FormLabel>
-                    <RadioGroup row aria-label="order" 
-                                name="row-radio-buttons-group"
-                                value={order}
-                                onChange={() => handleChange()}
-                    >
-                        <FormControlLabel value="ascending" control={<Radio />} label="Ascending" />
-                        <FormControlLabel value="descending" control={<Radio />} label="Descending" />
-                    </RadioGroup>
-                </MUFormControl>
+                    <Container small>
+                        <MUFormControl component="fieldset" margin="dense" size="small">
+                            <FormLabel component="legend" size="small">
+                                Sorting Order
+                                </FormLabel>
+                            <RadioGroup row aria-label="order" 
+                                        name="row-radio-buttons-group"
+                                        value={order}
+                                        onChange={() => handleChange()}
+                            >
+                                <FormControlLabel value="ascending" control={<Radio />} label="Ascending" />
+                                <FormControlLabel value="descending" control={<Radio />} label="Descending" />
+                            </RadioGroup>
+                        </MUFormControl>
+                    </Container>
                 </Col>
                 <Col md="auto">
                     <Dropdown>
@@ -413,17 +418,19 @@ export function Events (props) {
                     </span>
                 </Col>
                 <Col md="auto">
-                    <MUFormControl component="fieldset">
-                        <FormLabel component="legend">Sorting Order</FormLabel>
-                        <RadioGroup row aria-label="order" 
-                                    name="row-radio-buttons-group"
-                                    value={order}
-                                    onChange={() => handleChange()}
-                        >
-                        <FormControlLabel value="ascending" control={<Radio />} label="Ascending" />
-                        <FormControlLabel value="descending" control={<Radio />} label="Descending" />
-                        </RadioGroup>
-                    </MUFormControl>
+                    <Container small>
+                        <MUFormControl component="fieldset">
+                            <FormLabel component="legend">Sorting Order</FormLabel>
+                            <RadioGroup row aria-label="order" 
+                                        name="row-radio-buttons-group"
+                                        value={order}
+                                        onChange={() => handleChange()}
+                            >
+                            <FormControlLabel value="ascending" control={<Radio />} label="Ascending" />
+                            <FormControlLabel value="descending" control={<Radio />} label="Descending" />
+                            </RadioGroup>
+                        </MUFormControl>
+                    </Container>
                 </Col>
                 <Col md="auto">
                     <Dropdown>
