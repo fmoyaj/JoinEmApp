@@ -15,6 +15,7 @@ import MaterialButton from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import {RadioGroup, Radio, FormLabel, FormControlLabel} from '@material-ui/core';
 import MUFormControl from '@material-ui/core/FormControl';
+import { lightBlue } from '@material-ui/core/colors';
 
 // 'export' in front of the functions will allow the functions to be imported in other files, like App.js
 
@@ -53,6 +54,7 @@ export function Stats(props) {
     numOfCoinem: numCoinem(m)}}));
   const [sortType, setSortType] = React.useState("username");
   const [order, setOrder] = React.useState("ascending");
+  const [active, setActive] = React.useState({username: false, numOfCoinem: false, numOfEvents: false});
   
   // Sort array and set data
   function sortArray(array, type){
@@ -87,6 +89,9 @@ export function Stats(props) {
   // Sort by a new criteria if sortType or order has changed
   useEffect(() => {
       sortArray(memberData, sortType);
+      let newActive = Object.fromEntries(Object.keys(active).map( k => (k !== sortType)? [k, false]:[k, true]));
+      setActive(newActive);
+
     }, [sortType, order]);
   
   // Helper function changing order (hook state variable)
@@ -113,17 +118,19 @@ export function Stats(props) {
           </div>
         </Col>
         <Col md="auto">
-          <MUFormControl component="fieldset">
-            <FormLabel component="legend">Sorting Order</FormLabel>
-            <RadioGroup row aria-label="order" 
-                        name="row-radio-buttons-group"
-                        value={order}
-                        onChange={() => handleChange()}
-            >
-              <FormControlLabel value="ascending" control={<Radio />} label="Ascending" />
-              <FormControlLabel value="descending" control={<Radio />} label="Descending" />
-            </RadioGroup>
-         </MUFormControl>
+          <Container small>
+              <MUFormControl component="fieldset">
+                <FormLabel component="legend">Sorting Order</FormLabel>
+                <RadioGroup row aria-label="order" 
+                            name="row-radio-buttons-group"
+                            value={order}
+                            onChange={() => handleChange()}
+                >
+                  <FormControlLabel value="ascending" control={<Radio />} label="Ascending" />
+                  <FormControlLabel value="descending" control={<Radio />} label="Descending" />
+                </RadioGroup>
+            </MUFormControl>
+          </Container>
         </Col>
         <Col md="auto">
           <Dropdown>
@@ -131,15 +138,15 @@ export function Stats(props) {
               Sort by
             </Dropdown.Toggle>
             <Dropdown.Menu>
-              <Dropdown.Item eventKey="username" onClick={()=> setSortType("username")}>Username</Dropdown.Item>
-              <Dropdown.Item eventKey="numOfEvents" onClick={()=> setSortType("numOfEvents")}>Number of Events Planned</Dropdown.Item>
-              <Dropdown.Item eventKey="numOfCoinem" onClick={()=> setSortType("numOfCoinem")}>Number of Coinem Spent</Dropdown.Item>
+              <Dropdown.Item active={active.username} eventKey="Username" onClick={()=> setSortType("username")}>Username</Dropdown.Item>
+              <Dropdown.Item active={active.numOfEvents} eventKey="Number of events planned" onClick={()=> setSortType("numOfEvents")}>Number of events planned</Dropdown.Item>
+              <Dropdown.Item active={active.numOfCoinem} eventKey="Number of coinem spent" onClick={()=> setSortType("numOfCoinem")}>Number of coinem spent</Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
         </Col>
       </Row>
     </Container>
-    <Table striped border hover>
+    <Table striped border hover="true">
       <thead>
         <tr>
           <th>Username</th>
@@ -198,7 +205,7 @@ export function Stats(props) {
         // If this event title has been used, prompt user to enter new title
         if((newEvent && memberEvents.length < props.MAX_EVENTS
           && !props.events.map( e => e.title).includes(currentTitle)) || 
-          (newEvent && memberEvents.length == props.MAX_EVENTS)) {
+          (newEvent && memberEvents.length === props.MAX_EVENTS)) {
             setCurrentTitle("");
             setCurrentDescription(""); }
       }
@@ -286,14 +293,14 @@ export function Stats(props) {
     
     return (<div>
       {props.event.planner === props.currentUser && 
-      <div class="card">
-          <h5 class="card-header" style={{ display: 'flex'}}>
+      <div className="card">
+          <h5 className="card-header" style={{ display: 'flex'}}>
             {props.event.uid.toString() + ". " + props.event.title}
           </h5>
-          <div class="card-body">
-            <h5 class="card-title">{props.event.planner}</h5>
-            <p class="card-text">{props.event.description}</p>
-              <div class="card-mainDetails"> 
+          <div className="card-body">
+            <h5 className="card-title">{props.event.planner}</h5>
+            <p className="card-text">{props.event.description}</p>
+              <div className="card-mainDetails"> 
                 <OverlayTrigger trigger="hover" placement="top" overlay={<Popover className="popover" >
                   {"Members interested: " + membersCoinem.filter(m => (Object.keys(m[1]).includes((props.event.uid).toString()))).length +  ('\n\n(') + 
                   membersCoinem.filter(m => (Object.keys(m[1]).includes((props.event.uid).toString()))).map(m => [m[0], m[1][props.event.uid]]).join('\n') + (')' + 
@@ -303,7 +310,7 @@ export function Stats(props) {
                 <Button variant="light"><img src={coinem} className="icons"/>{" " + membersCoinem.filter(m => (Object.keys(m[1]).includes((props.event.uid).toString()))).map(m => m[1][props.event.uid]).reduce((n,sum) => n+sum, 0)}</Button>
                 </OverlayTrigger>
               </div>
-              <div class="card-editFeatures">
+              <div className="card-editFeatures">
                 <ModifyEvent events={props.events} handleEditEvent={props.handleEditEvent} handleNewEvent={props.handleNewEvent} 
                               currentUser={props.currentUser} MAX_EVENTS={props.MAX_EVENTS} deleteEvent={props.deleteEvent} 
                               initialTitle={props.event.title} initialDescription={props.event.description} 
@@ -317,38 +324,46 @@ export function Stats(props) {
           </div>
         </div>}
         {props.event.planner !== props.currentUser && 
-      <div class="card">
-          <h5 class="card-header" style={{ display: 'flex'}}>
+      <div className="card">
+          <h5 className="card-header" style={{ display: 'flex'}}>
             {props.event.uid.toString() + ". " + props.event.title}
           </h5>
-          <div class="card-body">
-            <div class="card-mainDetails">
-              <h5 class="card-title">{props.event.planner}</h5>
-              <p class="card-text">{props.event.description}</p>
-                  <OverlayTrigger trigger="hover" placement="top" overlay={<Popover className="popover" >
-                    {"Members interested: " + membersCoinem.filter(m => (Object.keys(m[1]).includes((props.event.uid).toString()))).length +  ('\n\n(') + 
-                    membersCoinem.filter(m => (Object.keys(m[1]).includes((props.event.uid).toString()))).map(m => [m[0], m[1][props.event.uid]]).join('\n') + (')' + 
-                    "\nTotal coinem: " + membersCoinem.filter(m => (Object.keys(m[1]).includes((props.event.uid).toString()))).map(m => m[1][props.event.uid]).reduce((n,sum) => n+sum, 0))
-                    }
-                    </Popover>}>
-                  <Button variant="light"><img src={coinem} className="icons"/>{" " + membersCoinem.filter(m => (Object.keys(m[1]).includes((props.event.uid).toString()))).map(m => m[1][props.event.uid]).reduce((n,sum) => n+sum, 0)}</Button>
-                  </OverlayTrigger>
-            </div>
-            <div class="card-editFeatures">
-              <div class="coinemSpentOnEvent">{currentCoinemSpent} coinem spent</div>
-              <ButtonGroup>
-                <MaterialButton 
-                  aria-label="reduce"
-                  onClick={() => props.toggleCoinemSpent(currentCoinemSpent, "reduce", props.event.uid)}>
-                  -
-                </MaterialButton>
-                <MaterialButton
-                  aria-label="increase"
-                  onClick={() => props.toggleCoinemSpent(currentCoinemSpent, "increase", props.event.uid)}>
-                  +
-                </MaterialButton>
-              </ButtonGroup>
-            </div>
+          <div className="card-body">
+            <Row>
+              <Col md="10">
+                <h5 className="card-title">{props.event.planner}</h5>
+                <p className="card-text">{props.event.description}</p>
+                    <OverlayTrigger trigger="hover" placement="top" overlay={<Popover className="popover" >
+                      <div>
+                        <p>
+                          {"Members interested: " + membersCoinem.filter(m => (Object.keys(m[1]).includes((props.event.uid).toString()))).length +  ('\n\n(') + 
+                          membersCoinem.filter(m => (Object.keys(m[1]).includes((props.event.uid).toString()))).map(m => [m[0], m[1][props.event.uid]]).join('\n') + ')'}
+                        </p>
+                        <div className="sep"></div>
+                        <p>
+                            {("Total coinem: " + membersCoinem.filter(m => (Object.keys(m[1]).includes((props.event.uid).toString()))).map(m => m[1][props.event.uid]).reduce((n,sum) => n+sum, 0))}
+                        </p>
+                        </div>
+                        </Popover>}>
+                      <Button variant="light"><img src={coinem} className="icons"/>{" " + membersCoinem.filter(m => (Object.keys(m[1]).includes((props.event.uid).toString()))).map(m => m[1][props.event.uid]).reduce((n,sum) => n+sum, 0)}</Button>
+                    </OverlayTrigger>
+              </Col>
+              <Col md="2" className = "my-auto" style={{background: "lightblue"}}>
+                <div className="coinemSpentOnEvent">{currentCoinemSpent} coinem spent</div>
+                <ButtonGroup>
+                  <MaterialButton 
+                    aria-label="reduce"
+                    onClick={() => props.toggleCoinemSpent(currentCoinemSpent, "reduce", props.event.uid)}>
+                    -
+                  </MaterialButton>
+                  <MaterialButton
+                    aria-label="increase"
+                    onClick={() => props.toggleCoinemSpent(currentCoinemSpent, "increase", props.event.uid)}>
+                    +
+                  </MaterialButton>
+                </ButtonGroup>
+              </Col>
+            </Row>
           </div>
         </div>}
         </div>); 
@@ -373,7 +388,10 @@ export function Stats(props) {
       coinemSpent: coinemSpent(e)}}));
     const [sortType, setSortType] = React.useState("uid"); // Set default sorting type
     const [order, setOrder] = React.useState("ascending"); // Set default sorting order
-  
+    const [filter, setFilter] = React.useState("all"); // See all events
+    const [active, setActive] = React.useState({uid: false, title: false, coinemSpent: false}); // Which option in dropdown is active
+    const [active2, setActive2] = React.useState({all: false, ownEvents: false, otherEvents: false, spentCoinem: false, notSpentCoinem: false});
+
     // Sort array and set data
     function sortArray(array, type){
       if (type !== "title") {
@@ -392,6 +410,44 @@ export function Stats(props) {
         setData(sorted);
       }
       };
+
+      function filterArray(filter){
+        let allEvents = props.data.map((e) => {return {title: e.title, 
+          uid: e.uid, planner: e.planner,
+          description: e.description, numMembersInterested: numMembersInterested(e), 
+          coinemSpent: coinemSpent(e)}});
+        let filteredData;
+        let uidEventsSpentCoinem = Object.keys(props.members.find(m => m.username === props.currentUser).coinem);
+
+        switch(filter){
+          case "all":
+            filteredData = allEvents;
+            break;
+          case "ownEvents":
+            filteredData = allEvents.filter(e => e.planner === props.currentUser);
+            break;
+          case "otherEvents":
+            filteredData = allEvents.filter(e => e.planner !== props.currentUser);
+            break;
+          case "spentCoinem":
+            filteredData = allEvents.filter(e => uidEventsSpentCoinem.includes(e.uid.toString()));
+            break;
+          case "notSpentCoinem":
+            filteredData = allEvents.filter(e => !uidEventsSpentCoinem.includes(e.uid.toString()) && e.planner !== props.currentUser);
+            break;
+          // No default
+          }
+        
+          sortArray(filteredData);
+
+      }
+
+      useEffect(() => {
+        filterArray(filter);
+        let newActive = Object.fromEntries(Object.keys(active2).map( k => (k !== filter)? [k, false]:[k, true]));
+        setActive2(newActive);
+      }, [filter]
+      );
     
     /* Track changes in props.data due to modification to App's events list global state. 
        Tracks if a new event was created or deleted or if sortType was changed to sort list*/
@@ -401,12 +457,14 @@ export function Stats(props) {
           description: e.description, numMembersInterested: numMembersInterested(e), 
           coinemSpent: coinemSpent(e)}});
         sortArray(mappedEvents, sortType);
-        
+        setFilter(filter.split('').join('')); // Prompt list re-filtering and re-redndering
       }, [props.data]);
     
     // Sort by a new criteria if sortType or order are changed
     useEffect(() => {
         sortArray(eventData, sortType);
+        let newActive = Object.fromEntries(Object.keys(active).map( k => (k !== sortType)? [k, false]:[k, true]));
+        setActive(newActive);
       }, [sortType, order]);
   
     
@@ -428,21 +486,23 @@ export function Stats(props) {
           <Col md="auto">
             <h3 className="inLineDivs">Events</h3>
             <span className="inLineDivs">
-              {props.data.length}
+              {eventData.length}
             </span>
           </Col>
           <Col md="auto">
-            <MUFormControl component="fieldset">
-                      <FormLabel component="legend">Sorting Order</FormLabel>
-                      <RadioGroup row aria-label="order" 
-                                  name="row-radio-buttons-group"
-                                  value={order}
-                                  onChange={() => handleChange()}
-                      >
-                        <FormControlLabel value="ascending" control={<Radio />} label="Ascending" />
-                        <FormControlLabel value="descending" control={<Radio />} label="Descending" />
-                      </RadioGroup>
-            </MUFormControl>
+            <Container small>
+              <MUFormControl component="fieldset">
+                        <FormLabel component="legend">Sorting Order</FormLabel>
+                        <RadioGroup row aria-label="order" 
+                                    name="row-radio-buttons-group"
+                                    value={order}
+                                    onChange={() => handleChange()}
+                        >
+                          <FormControlLabel value="ascending" control={<Radio />} label="Ascending" />
+                          <FormControlLabel value="descending" control={<Radio />} label="Descending" />
+                        </RadioGroup>
+              </MUFormControl>
+            </Container>
           </Col>
           <Col md="auto">
             <Dropdown>
@@ -450,9 +510,23 @@ export function Stats(props) {
                   Sort by
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
-                  <Dropdown.Item eventKey="uid" onClick={()=> setSortType("uid")}>UID</Dropdown.Item>
-                  <Dropdown.Item eventKey="title" onClick={()=> setSortType("title")}>Title</Dropdown.Item>
-                  <Dropdown.Item eventKey="coinemSpent" onClick={()=> setSortType("coinemSpent")}>Coinem Spent</Dropdown.Item>
+                  <Dropdown.Item active={active.uid} eventKey="uid" onClick={()=> setSortType("uid")}>UID</Dropdown.Item>
+                  <Dropdown.Item active={active.title} eventKey="title" onClick={()=> setSortType("title")}>Title</Dropdown.Item>
+                  <Dropdown.Item active={active.coinemSpent} eventKey="coinemSpent" onClick={()=> setSortType("coinemSpent")}>Coinem spent</Dropdown.Item>
+                </Dropdown.Menu>
+            </Dropdown>
+          </Col>
+          <Col md="auto">
+            <Dropdown>
+                <Dropdown.Toggle variant="dark" id="dropdown-basic">
+                  Filter
+                </Dropdown.Toggle>
+                <Dropdown.Menu> 
+                  <Dropdown.Item active={active2.all} eventKey="allEvents" onClick={()=> setFilter("all")}>All events</Dropdown.Item>
+                  <Dropdown.Item active={active2.ownEvents} eventKey="ownEvents" onClick={()=> setFilter("ownEvents")}>My events</Dropdown.Item>
+                  <Dropdown.Item active={active2.otherEvents} eventKey="otherEvents" onClick={()=> setFilter("otherEvents")}>Events planned by others</Dropdown.Item>
+                  <Dropdown.Item active={active2.spentCoinem} eventKey="spentCoinem" onClick={()=> setFilter("spentCoinem")}>Events supported</Dropdown.Item>
+                  <Dropdown.Item active={active2.notSpentCoinem} eventKey="notSpentCoinem" onClick={()=> setFilter("notSpentCoinem")}>Events not supported</Dropdown.Item>
                 </Dropdown.Menu>
             </Dropdown>
           </Col>
@@ -485,11 +559,13 @@ export function Stats(props) {
     
       return (
         <>
-          <div style={{display: 'flex', justifyContent: 'center'}}>
-            <Button variant="danger"onClick={handleOpen}>
-              Delete Account
-            </Button>
-          </div>
+          <Container flex>
+            <div style={{display: 'flex', justifyContent: 'center', padding:'5%'}}>
+              <Button variant="danger"onClick={handleOpen}>
+                Delete Account
+              </Button>
+            </div>
+          </Container>
           <Modal show={show} onHide={handleClose}>
             <Modal.Body>
               Are you sure you would like to delete your account? This action cannot be reversed.

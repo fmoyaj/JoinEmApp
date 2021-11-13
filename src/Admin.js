@@ -5,15 +5,13 @@ import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Popover from 'react-bootstrap/Popover';
-import { Container, Alert, InputGroup, FormControl, Row, Col} from 'react-bootstrap';
-import {Dropdown} from 'react-bootstrap';
-import editing from './icons/editing.png';
+import { Container, Alert, InputGroup, FormControl, Row, Col, Dropdown, Modal} from 'react-bootstrap';
 import coinem from './icons/coinem_icon.png'
-import { Modal } from 'react-bootstrap';
 import { useState, useEffect } from 'react';
 import {RadioGroup, Radio, FormLabel, FormControlLabel, IconButton} from '@material-ui/core';
 import MUFormControl from '@material-ui/core/FormControl';
 import EditIcon from '@mui/icons-material/Edit';
+import { TryRounded } from '@mui/icons-material';
 
 
 // 'export' in front of the functions will allow the functions to be imported in other files, like App.js
@@ -78,10 +76,9 @@ export function EditGlobals(props) {
   
     return (
       <>
-        <IconButton aria-label="edit" onClick={handleOpen} >
+        <IconButton aria-label="edit" onClick={handleOpen} color="info">
             <EditIcon />
         </IconButton>
-  
         <Modal show={show} onHide={handleClose}>
             <Modal.Header>
                 <Modal.Title>{"Edit " + props.title}</Modal.Title>
@@ -223,6 +220,8 @@ export function Members(props){
         numOfCoinem: numCoinem(m)}}));
     const [sortType, setSortType] = React.useState("username");
     const [order, setOrder] = React.useState("ascending");
+    const [active, setActive] = React.useState({username: false, numOfCoinem: false, numOfEvents: false}); // Which option in dropdown is active
+    
   
     // Sort array and set data
     function sortArray(array, type){
@@ -255,6 +254,8 @@ export function Members(props){
     // Sort by a new criteria
     useEffect(() => {
         sortArray(memberData, sortType);
+        let newActive = Object.fromEntries(Object.keys(active).map( k => (k !== sortType)? [k, false]:[k, true]));
+        setActive(newActive);
         }, [sortType, order]);
 
 
@@ -303,9 +304,9 @@ export function Members(props){
                         Sort by
                     </Dropdown.Toggle>
                     <Dropdown.Menu>
-                        <Dropdown.Item eventKey="username" onClick={()=> setSortType("username")}>Username</Dropdown.Item>
-                        <Dropdown.Item eventKey="numOfEvents" onClick={()=> setSortType("numOfEvents")}>Number of Events Planned</Dropdown.Item>
-                        <Dropdown.Item eventKey="numOfCoinem" onClick={()=> setSortType("numOfCoinem")}>Number of Coinem Spent</Dropdown.Item>
+                        <Dropdown.Item active={active.username} eventKey="username" onClick={()=> setSortType("username")}>Username</Dropdown.Item>
+                        <Dropdown.Item active={active.numOfEvents} eventKey="numOfEvents" onClick={()=> setSortType("numOfEvents")}>Number of Events Planned</Dropdown.Item>
+                        <Dropdown.Item active={active.numOfCoinem} eventKey="numOfCoinem" onClick={()=> setSortType("numOfCoinem")}>Number of Coinem Spent</Dropdown.Item>
                     </Dropdown.Menu>
                     </Dropdown>
                 </Col>
@@ -363,6 +364,7 @@ export function Events (props) {
         coinemSpent: coinemSpent(e)}}));
     const [sortType, setSortType] = React.useState("uid");
     const [order, setOrder] = React.useState("ascending");
+    const [active, setActive] = React.useState({uid: false, title: false, coinemSpent: false}); // Which option in dropdown is active
   
     // Sort array and set data
     function sortArray(array, type){
@@ -395,6 +397,8 @@ export function Events (props) {
     // Sort by a new criteria
     useEffect(() => {
         sortArray(eventData, sortType);
+        let newActive = Object.fromEntries(Object.keys(active).map( k => (k !== sortType)? [k, false]:[k, true]));
+        setActive(newActive);
     }, [sortType, order]);
   
     
@@ -438,9 +442,9 @@ export function Events (props) {
                         Sort by
                         </Dropdown.Toggle>
                         <Dropdown.Menu>
-                        <Dropdown.Item eventKey="uid" onClick={()=> setSortType("uid")}>UID</Dropdown.Item>
-                        <Dropdown.Item eventKey="title" onClick={()=> setSortType("title")}>Title</Dropdown.Item>
-                        <Dropdown.Item eventKey="coinemSpent" onClick={()=> setSortType("coinemSpent")}>Coinem Spent</Dropdown.Item>
+                        <Dropdown.Item active={active.uid} eventKey="uid" onClick={()=> setSortType("uid")}>UID</Dropdown.Item>
+                        <Dropdown.Item active={active.title} eventKey="title" onClick={()=> setSortType("title")}>Title</Dropdown.Item>
+                        <Dropdown.Item active={active.coinemSpent} eventKey="coinemSpent" onClick={()=> setSortType("coinemSpent")}>Coinem Spent</Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown>
                 </Col>
@@ -448,8 +452,8 @@ export function Events (props) {
             </Container>
 
             {eventData.map(event => (
-                <div class="card">
-                <h5 class="card-header" style={{ display: 'flex'}}>
+                <div className="card">
+                <h5 className="card-header" style={{ display: 'flex'}}>
                     {event.uid.toString() + ". " + event.title}
                     <Button variant="outline-secondary" size="sm" 
                             style={{ marginLeft: "auto" }}
@@ -457,9 +461,9 @@ export function Events (props) {
                             Delete
                     </Button>
                 </h5> 
-                <div class="card-body">
-                    <h5 class="card-title">{event.planner}</h5>
-                    <p class="card-text">{event.description}</p>
+                <div className="card-body">
+                    <h5 className="card-title">{event.planner}</h5>
+                    <p className="card-text">{event.description}</p>
                         <OverlayTrigger trigger="hover" placement="top" overlay={<Popover className="popover" >
                         {"Members interested: " + membersCoinem.filter(m => (Object.keys(m[1]).includes((event.uid).toString()))).length +  ('\n\n(') + 
                         membersCoinem.filter(m => (Object.keys(m[1]).includes((event.uid).toString()))).map(m => [m[0], m[1][event.uid]]).join('\n') + (')' + 

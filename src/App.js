@@ -1,7 +1,7 @@
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React from 'react';
-import { Container, Accordion, Button, Navbar, Nav, Dropdown, Row, Col} from 'react-bootstrap';
+import { Container, Accordion, Button, Navbar, Nav, Dropdown, Row} from 'react-bootstrap';
 import { Globals, Members, Events } from './Admin.js';
 import { Stats, MemberView, MemberEvents, DeleteAccount } from './Member.js';
 import upload from './icons/upload.png';
@@ -18,7 +18,7 @@ class App extends React.Component{
       MAX_COINEM: 20,
       NEXT_EVENT_UID: 1,
       members : [],
-      newMember : {username: '', name: '', lastname: '', coinem: 0,},
+      newMember : {username: '', name: '', lastname: '', coinem: 0,}, // Information for new member being added
       events: [],
       fileDownloadUrl: null,
       fileInfo: "",
@@ -37,7 +37,8 @@ class App extends React.Component{
     this.handleEditEvent = this.handleEditEvent.bind(this);
   }
 
-  handleInputChange(e){
+  /* Handles changes made to new user input */
+  handleInputChange(e){ 
     const target = e.target;
 
     switch(target.name){
@@ -56,6 +57,7 @@ class App extends React.Component{
 
   }
 
+  /* Adds new user to member list */
   handleNewUser(newUsername, newName, newLastname){
     // Checking that username is unique
     if (!(this.state.members.map(m => m.username).includes(newUsername))){
@@ -109,10 +111,11 @@ class App extends React.Component{
     })
   }
 
+  /* Modifies global variables changed by user. maxValue is the current maximum value held by a user for each variable*/
   handleSaveChanges (newGlobalValue, nameGlobal, maxValue){
     switch(nameGlobal){
       case "Max Events":
-        if (newGlobalValue > maxValue){
+        if (newGlobalValue > maxValue){ 
           this.setState({MAX_EVENTS: newGlobalValue});
         }
         break;
@@ -167,7 +170,7 @@ class App extends React.Component{
     reader.onload = fileLoadedHandler;
     reader.readAsText(fileObj);
 }
-
+  /* Handles switching user from admin to other users */
   becomeMember(name){
     this.setState({currentUser: name});
   }
@@ -176,15 +179,18 @@ class App extends React.Component{
   handleNewEvent(newTitle, newDescription){
     let memberEvents = this.state.events.map(e => e.planner).filter(e => e === this.state.currentUser);
 
+    // If title and description are not empty, the event name is unique, and the member can still plan events
     if(newTitle !== "" && newDescription !== "" 
       && memberEvents.length < this.state.MAX_EVENTS && !this.state.events.map( e => e.title).includes(newTitle)){
         this.setState({events: [...this.state.events, {uid: this.state.NEXT_EVENT_UID, title: newTitle, description: newDescription, planner: this.state.currentUser}], 
         NEXT_EVENT_UID: this.state.NEXT_EVENT_UID + 1});
     }
     else{
+      // User leaves field empty
       if(newTitle === "" || newDescription === ""){
         alert("Please fill out all text fields before submitting!");  
       }
+      // If the user has reached the maximum number of events they can plan
       else if(memberEvents.length === this.state.MAX_EVENTS){
         alert("You have reached the maximum number of events you can plan." +  
         " You cannot plan a new event until another event has been deleted.");  
@@ -196,14 +202,19 @@ class App extends React.Component{
     }
   }
 
+  /* Edits an event from the events list */
   handleEditEvent(title, description, currentUid){
+    // Index of the event being modified
     let index = this.state.events.indexOf(this.state.events.filter(e => e.uid === currentUid)[0]);
+    // All events that are not being modified. We remove the event being modified from the list. 
     let updatedEvents = this.state.events.filter(e => e.uid !== currentUid);
+    // Add event with modifications at previous index
     updatedEvents.splice(index, 0, {uid: currentUid, title: title, description: description, planner: this.state.currentUser});
     if(title !== "" && description !== "") {
         this.setState({events: updatedEvents});
     }
     else{
+      // Show alert if title or description or modified event are left blank
       if(title === "" || description === ""){
         alert("Please fill out all text fields before submitting!");  
       }
@@ -211,10 +222,13 @@ class App extends React.Component{
   }
 
 
-
+  /* Updates coinem spent by the current user when the + or - buttons are toggled */
   toggleCoinemSpent(currentCoinemSpent, operation, uid){
+    // Coinem of the current user using the platform
     let currentUserInfo = this.state.members.filter(member => member.username===this.state.currentUser)[0]
+    // Number of total coinem spent by current user
     let coinemSpentAllEvents = Object.values(currentUserInfo.coinem).reduce((n, sum) => n + sum, 0);
+    // Number of coinem spent by user in the event with the given uid
     let currentCoinem = currentUserInfo.coinem[uid] === undefined? 0:currentUserInfo.coinem[uid];
 
     if (currentCoinemSpent <= this.state.MAX_COINEM_PER_EVENT) {
@@ -249,7 +263,7 @@ class App extends React.Component{
                       Members
                     </Dropdown.Toggle>
                     <Dropdown.Menu style={{ maxHeight: "200px", overflowY: "auto"}}>
-                      <Dropdown.Item onClick={()=> this.becomeMember("admin")}>admin</Dropdown.Item>
+                      <Dropdown.Item eventKey="admin" onClick={()=> this.becomeMember("admin")}>admin</Dropdown.Item>
                       {sortStringList(this.state.members, "username").map(m =>
                         <Dropdown.Item eventKey={m.username} onClick={()=> this.becomeMember(m.username)}>{m.username}</Dropdown.Item>
                         )}

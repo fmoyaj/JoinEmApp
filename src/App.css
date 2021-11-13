@@ -88,6 +88,15 @@ header{
   color: #61dafb;
 }
 
+br {
+  height: 10px;
+}
+
+.sep {
+  height: 2px;
+  color: #61dafb;
+}
+
 
 @keyframes App-logo-spin {
   from {
@@ -108,5 +117,5 @@ header{
   float:right; 
   background:lightblue;
   width:20%;
-  height:100%;
+  justify-content: center;
 }
