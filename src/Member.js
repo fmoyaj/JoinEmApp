@@ -298,29 +298,39 @@ export function Stats(props) {
             {props.event.uid.toString() + ". " + props.event.title}
           </h5>
           <div className="card-body">
-            <h5 className="card-title">{props.event.planner}</h5>
-            <p className="card-text">{props.event.description}</p>
-              <div className="card-mainDetails"> 
-                <OverlayTrigger trigger="hover" placement="top" overlay={<Popover className="popover" >
-                  {"Members interested: " + membersCoinem.filter(m => (Object.keys(m[1]).includes((props.event.uid).toString()))).length +  ('\n\n(') + 
-                  membersCoinem.filter(m => (Object.keys(m[1]).includes((props.event.uid).toString()))).map(m => [m[0], m[1][props.event.uid]]).join('\n') + (')' + 
-                  "\nTotal coinem: " + membersCoinem.filter(m => (Object.keys(m[1]).includes((props.event.uid).toString()))).map(m => m[1][props.event.uid]).reduce((n,sum) => n+sum, 0))
-                  }
-                  </Popover>}>
-                <Button variant="light"><img src={coinem} className="icons"/>{" " + membersCoinem.filter(m => (Object.keys(m[1]).includes((props.event.uid).toString()))).map(m => m[1][props.event.uid]).reduce((n,sum) => n+sum, 0)}</Button>
-                </OverlayTrigger>
-              </div>
-              <div className="card-editFeatures">
-                <ModifyEvent events={props.events} handleEditEvent={props.handleEditEvent} handleNewEvent={props.handleNewEvent} 
-                              currentUser={props.currentUser} MAX_EVENTS={props.MAX_EVENTS} deleteEvent={props.deleteEvent} 
-                              initialTitle={props.event.title} initialDescription={props.event.description} 
-                              initialUid={props.event.uid} buttonTitle={"Edit"} newEvent={false}></ModifyEvent>
-                <Button variant="outline-secondary" size="sm" 
-                        style={{ marginLeft: "auto" }}
-                        onClick={() => props.deleteEvent(props.event.uid)}>
-                  Delete
-                </Button>
-              </div>
+            <Row>
+              <Col md="10">
+                <h5 className="card-title">{props.event.planner}</h5>
+                <p className="card-text">{props.event.description}</p>
+                  <div className="card-mainDetails"> 
+                    <OverlayTrigger trigger="hover" placement="top" overlay={<Popover className="popover" >
+                      {"Members interested: " + membersCoinem.filter(m => (Object.keys(m[1]).includes((props.event.uid).toString()))).length +  ('\n\n(') + 
+                      membersCoinem.filter(m => (Object.keys(m[1]).includes((props.event.uid).toString()))).map(m => [m[0], m[1][props.event.uid]]).join('\n') + (')' + 
+                      "\nTotal coinem: " + membersCoinem.filter(m => (Object.keys(m[1]).includes((props.event.uid).toString()))).map(m => m[1][props.event.uid]).reduce((n,sum) => n+sum, 0))
+                      }
+                      </Popover>}>
+                    <Button variant="light"><img src={coinem} className="icons"/>{" " + membersCoinem.filter(m => (Object.keys(m[1]).includes((props.event.uid).toString()))).map(m => m[1][props.event.uid]).reduce((n,sum) => n+sum, 0)}</Button>
+                    </OverlayTrigger>
+                  </div>
+              </Col>
+              <Col md="2">
+                  <Row>
+                    <Col md="auto" className = "my-auto">
+                      <ModifyEvent events={props.events} handleEditEvent={props.handleEditEvent} handleNewEvent={props.handleNewEvent} 
+                                    currentUser={props.currentUser} MAX_EVENTS={props.MAX_EVENTS} deleteEvent={props.deleteEvent} 
+                                    initialTitle={props.event.title} initialDescription={props.event.description} 
+                                    initialUid={props.event.uid} buttonTitle={"Edit"} newEvent={false}></ModifyEvent>
+                    </Col>
+                    <Col md="auto" className = "my-auto">
+                    <Button variant="outline-secondary" size="sm" 
+                            style={{ marginLeft: "auto" }}
+                            onClick={() => props.deleteEvent(props.event.uid)}>
+                      Delete
+                    </Button>
+                    </Col>
+                  </Row>
+              </Col>
+            </Row>
           </div>
         </div>}
         {props.event.planner !== props.currentUser && 
@@ -348,7 +358,7 @@ export function Stats(props) {
                       <Button variant="light"><img src={coinem} className="icons"/>{" " + membersCoinem.filter(m => (Object.keys(m[1]).includes((props.event.uid).toString()))).map(m => m[1][props.event.uid]).reduce((n,sum) => n+sum, 0)}</Button>
                     </OverlayTrigger>
               </Col>
-              <Col md="2" className = "my-auto" style={{background: "lightblue"}}>
+              <Col md="2" className = "my-auto">
                 <div className="coinemSpentOnEvent">{currentCoinemSpent} coinem spent</div>
                 <ButtonGroup>
                   <MaterialButton 
