@@ -32,26 +32,26 @@ export function Globals(props){
     let maxCoinemUser = Math.max(...coinemUser);
   
     return(
-    <div>
-        <span className="dashboardElem">
-            {props.maxEvents}<br/>
-            max events
-            <EditGlobals title={"Max Events"} handleSaveChanges={props.handleSaveChanges} events={props.events} maxValue={maxEvents}></EditGlobals>
-        </span>
-        <span className="dashboardElem">
-            {props.maxCoinemEvent}<br/>
-            max coinem per event
-            <EditGlobals title="Max Coinem Per Event" handleSaveChanges={props.handleSaveChanges} events={props.events} maxValue={maxCoinemEvent}></EditGlobals>
-        </span>
-        <span className="dashboardElem">
-            {props.maxCoinem}<br/>
-            max coinem per user
-            <EditGlobals title="Max Coinem Per User" handleSaveChanges={props.handleSaveChanges} events={props.events} maxValue={maxCoinemUser}></EditGlobals>
-        </span>
-        <span className="dashboardElem">
-            {props.nextUID}<br/>
-            next event UID
-        </span>
+    <div className="top-spacing flexbox-container">
+        <div className="dashboardElem">
+            <div className="dashboardElem-number">{props.maxEvents}</div>
+            <div>max events</div>
+            <div><EditGlobals title={"Max Events"} handleSaveChanges={props.handleSaveChanges} events={props.events} maxValue={maxEvents}></EditGlobals></div>
+        </div>
+        <div className="dashboardElem">
+            <div className="dashboardElem-number">{props.maxCoinemEvent}</div>
+            <div>max coinem per event</div>
+            <div><EditGlobals title="Max Coinem Per Event" handleSaveChanges={props.handleSaveChanges} events={props.events} maxValue={maxCoinemEvent}></EditGlobals></div>
+        </div>
+        <div className="dashboardElem">
+            <div className="dashboardElem-number">{props.maxCoinem}</div>
+            <div>max coinem per user</div>
+            <div><EditGlobals title="Max Coinem Per User" handleSaveChanges={props.handleSaveChanges} events={props.events} maxValue={maxCoinemUser}></EditGlobals></div>
+        </div>
+        <div className="dashboardElem">
+            <div className="dashboardElem-number">{props.nextUID}</div>
+            <div>next event UID</div>
+        </div>
     </div>);
   }
 
@@ -268,7 +268,7 @@ export function Members(props){
     };
 
     return(
-        <div>
+        <div className="top-spacing">
             <Container fluid>
                 <Row>
                 <Col md="auto">
@@ -412,7 +412,7 @@ export function Events (props) {
   
   
     return(
-        <div>
+        <div className="top-spacing">
             <Container fluid>
                 <Row>
                 <Col md="auto">

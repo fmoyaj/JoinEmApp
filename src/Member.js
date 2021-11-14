@@ -13,9 +13,10 @@ import { Modal } from 'react-bootstrap';
 import { useState, useEffect } from 'react';
 import MaterialButton from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
-import {RadioGroup, Radio, FormLabel, FormControlLabel} from '@material-ui/core';
+import {RadioGroup, Radio, FormLabel, FormControlLabel, Divider} from '@material-ui/core';
 import MUFormControl from '@material-ui/core/FormControl';
 import { lightBlue } from '@material-ui/core/colors';
+import { RowingRounded } from '@mui/icons-material';
 
 // 'export' in front of the functions will allow the functions to be imported in other files, like App.js
 
@@ -25,21 +26,21 @@ import { lightBlue } from '@material-ui/core/colors';
    member has left to spend*/
 export function Stats(props) {
     let member = props.members.filter(m => m.username === props.user)[0];
-    return(
-    <div>
-      <span className="dashboardElem">
-        {props.maxEvents-props.events.filter(e => e.planner === props.user).length}<br/>
-        out of {props.maxEvents} events left
-      </span>
-      <span className="dashboardElem">
-        {props.maxCoinem-Object.values(member.coinem).reduce((n,sum) => n+sum, 0)}<br/>
-        out of {props.maxCoinem} coinem left
-      </span>
-    </div>)
+    return (
+      <div className="top-spacing flexbox-container">
+        <div className="dashboardElem">
+          <div className="dashboardElem-number">{props.maxEvents-props.events.filter(e => e.planner === props.user).length}</div>
+          out of {props.maxEvents} events left
+        </div>
+        <div className="dashboardElem">
+          <div className="dashboardElem-number">{props.maxCoinem-Object.values(member.coinem).reduce((n,sum) => n+sum, 0)}</div>
+          out of {props.maxCoinem} coinem left
+        </div>
+      </div>)
   }
   
   /* Renders table of users in member view as well as sorting functionality */
-  export function MemberView(props){
+export function MemberView(props){
   // Arrow functions to extract the number of events of a member and the number of coinem spent by a member
   let numEvents = (member) => props.events.map(e => e.planner).filter(e => e === member.username).length;
   let numCoinem = (member) => Object.values(member.coinem).reduce((n,sum) => n+sum, 0);
@@ -109,7 +110,7 @@ export function Stats(props) {
       <Row>
         <Col md="auto">
           <div className="headers">
-            <h3 className="inLineDivs">
+            <h3 className="inLineDivs" >
               Members
             </h3>
             <span className="inLineDivs">
@@ -314,21 +315,19 @@ export function Stats(props) {
                   </div>
               </Col>
               <Col md="2">
-                  <Row>
-                    <Col md="auto" className = "my-auto">
-                      <ModifyEvent events={props.events} handleEditEvent={props.handleEditEvent} handleNewEvent={props.handleNewEvent} 
-                                    currentUser={props.currentUser} MAX_EVENTS={props.MAX_EVENTS} deleteEvent={props.deleteEvent} 
-                                    initialTitle={props.event.title} initialDescription={props.event.description} 
-                                    initialUid={props.event.uid} buttonTitle={"Edit"} newEvent={false}></ModifyEvent>
-                    </Col>
-                    <Col md="auto" className = "my-auto">
-                    <Button variant="outline-secondary" size="sm" 
-                            style={{ marginLeft: "auto" }}
-                            onClick={() => props.deleteEvent(props.event.uid)}>
-                      Delete
+                <div className="card-editButton">
+                  <ModifyEvent events={props.events} handleEditEvent={props.handleEditEvent} handleNewEvent={props.handleNewEvent} 
+                                currentUser={props.currentUser} MAX_EVENTS={props.MAX_EVENTS} deleteEvent={props.deleteEvent} 
+                                initialTitle={props.event.title} initialDescription={props.event.description} 
+                                initialUid={props.event.uid} buttonTitle={"Edit"} newEvent={false}></ModifyEvent>
+                </div>
+                <div className="card-deleteButton">
+                  <Button variant="outline-secondary" size="sm" 
+                          style={{ marginLeft: "auto" }}
+                          onClick={() => props.deleteEvent(props.event.uid)}>
+                    Delete
                     </Button>
-                    </Col>
-                  </Row>
+                </div>
               </Col>
             </Row>
           </div>
@@ -358,8 +357,9 @@ export function Stats(props) {
                       <Button variant="light"><img src={coinem} className="icons"/>{" " + membersCoinem.filter(m => (Object.keys(m[1]).includes((props.event.uid).toString()))).map(m => m[1][props.event.uid]).reduce((n,sum) => n+sum, 0)}</Button>
                     </OverlayTrigger>
               </Col>
-              <Col md="2" className = "my-auto">
-                <div className="coinemSpentOnEvent">{currentCoinemSpent} coinem spent</div>
+              <Col md="2" className = "my-auto card-editFeatures">
+                <div className="coinemSpentOnEvent">{currentCoinemSpent}</div>
+                <div>coinem spent</div>
                 <ButtonGroup>
                   <MaterialButton 
                     aria-label="reduce"
@@ -489,9 +489,7 @@ export function Stats(props) {
   
     return(
     <div>
-      <Container fluid style={{
-      paddingTop: '20px'
-    }}>
+      <Container fluid style={{paddingTop: '20px'}} className="top-spacing">
         <Row>
           <Col md="auto">
             <h3 className="inLineDivs">Events</h3>
@@ -500,7 +498,7 @@ export function Stats(props) {
             </span>
           </Col>
           <Col md="auto">
-            <Container small>
+            <Container small >
               <MUFormControl component="fieldset">
                         <FormLabel component="legend">Sorting Order</FormLabel>
                         <RadioGroup row aria-label="order" 

@@ -274,7 +274,7 @@ class App extends React.Component{
             </Container>
           </Navbar>
           { this.state.currentUser === "admin" &&
-            <Container fluid>
+            <Container fluid >
               <div>
                   <Row>
                       <Card sx={{ maxWidth: 345 }}>
@@ -359,7 +359,7 @@ class App extends React.Component{
                   maxEvents={this.state.MAX_EVENTS} 
                   maxCoinem={this.state.MAX_COINEM}>
           </Stats> 
-            <Accordion>
+            <Accordion className="top-spacing">
             <Accordion.Item eventKey="0">
               <Accordion.Header>Members</Accordion.Header>
               <Accordion.Body>

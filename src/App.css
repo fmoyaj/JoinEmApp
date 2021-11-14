@@ -55,12 +55,26 @@
   margin-left: "auto";
 }
 
+.flexbox-container {
+  display: flex;
+  flex-wrap: nowrap;
+}
 
 .dashboardElem{
+  margin-left: 25px;
   padding: 20px;
+  padding-left: 40px;
+  padding-right: 40px;
   color: black;
-  display: inline-flex;
   flex-direction: row;
+  border-radius: 5px 5px 5px;
+  border: 1px solid black;
+  text-align: center;
+  justify-content: center;
+}
+
+.dashboardElem-number {
+  font-size: 18pt;
 }
 
 .inLineDivs{
@@ -107,15 +121,35 @@ br {
   }
 }
 
+.top-spacing {
+  margin-top: 70px;
+}
 
 /* Event Cards */
 .card-mainDetails{
   float:left;
   width:70%;
 }
+
 .card-editFeatures {
   float:right; 
-  background:lightblue;
   width:20%;
   justify-content: center;
+  text-align: center;
+}
+
+.coinemSpentOnEvent {
+  font-size: 18pt;
+}
+
+.card-editButton {
+  justify-content: center;
+  text-align: center;
+  margin: 20px;
+}
+
+.card-deleteButton {
+  justify-content: center;
+  text-align: center;
+  margin: 20px;
 }
