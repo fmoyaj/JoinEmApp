@@ -294,7 +294,7 @@ export function MemberView(props){
     
     return (<div>
       {props.event.planner === props.currentUser && 
-      <div className="card">
+      <div className="card card-spacing">
           <h5 className="card-header" style={{ display: 'flex'}}>
             {props.event.uid.toString() + ". " + props.event.title}
           </h5>
@@ -333,7 +333,7 @@ export function MemberView(props){
           </div>
         </div>}
         {props.event.planner !== props.currentUser && 
-      <div className="card">
+      <div className="card card-spacing">
           <h5 className="card-header" style={{ display: 'flex'}}>
             {props.event.uid.toString() + ". " + props.event.title}
           </h5>

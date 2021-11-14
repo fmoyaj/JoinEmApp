@@ -452,7 +452,7 @@ export function Events (props) {
             </Container>
 
             {eventData.map(event => (
-                <div className="card">
+                <div className="card card-spacing">
                 <h5 className="card-header" style={{ display: 'flex'}}>
                     {event.uid.toString() + ". " + event.title}
                     <Button variant="outline-secondary" size="sm" 
