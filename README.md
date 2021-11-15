@@ -1,70 +1,24 @@
-# Getting Started with Create React App
+# Join'Em
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Join’em is a React web app where users can organize events and vote for their favorite events that other users have planned. Currently, the Join’em interface supports administrator-only use, and it has two main views: the administrator view and the member view.
 
-## Available Scripts
+## Navigation
+Join’em has a navigation bar that features a dropdown button to switch between the admin and member views. An admin can become any member by clicking on their username in the dropdown menu. The currently selected user is highlighted in the member list to indicate what user profile (or admin view) is being displayed. 
 
-In the project directory, you can run:
+## Admin View
+The admin screen features a database management section on top where the admin can upload a JSON file that has information about the state of the global variables (maximum number of events that can be planned for a user, maximum number of coinem that users can use, etc.), the members list, and the events list. The admin can also use the database management panel to download the current database. 
 
-### `npm start`
+In this testing version, we expect the administrator to upload the database every time they open the app, so we wanted to simplify that process by placing the panel at the top of the page. This way, the admin can easily load files into the app as a first step. 
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+We also included a table with the information on all members. Members can be removed by pressing the delete button. Both users and members can be sorted based on some criteria. We chose to use a dropdown button that highlights the criteria that is currently being used to sort. The events section is a series of cards. Aside from the event information, each card has a gray button that shows the total coinem allocated to the event. 
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
 
-### `npm test`
+## Member View
+The member view reflects the admin view with a few tweaks. For example, the top panel only includes how many events left that they can plan and how many coinem left that they can spend. These variables are not editable. In addition, the table to view all members is collapsable. Members can delete their own account, but to make it less likely for a member to accidentally delete their account, we placed the Delete Account button at the bottom of the page in red.  A popup also appears when the button is pressed so that the member must confirm their decision before following through with the action.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Members can give coinem to others events or edit/delete their own event. We made these actions accessible on the event cards. For events that the current member created themselves, the right side of the event card will have Edit and Delete buttons. But for events that they did not plan, they’ll see the amount of coinem they’ve given each event along with Plus and Minus buttons underneath to change the amount of coinem they’ve given.
 
-### `npm run build`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Future Features
+If we had more time, we would have liked to add a user-readable creation timestamp to each event. Along with the creation timestamp, we would also give the option to add an event date. These two add-ons would improve the user experience because members would be able to gauge whether or not an event has expired. Events with event dates will have a clear expiration date, but for events that don’t have event dates, users can check the creation timestamp. If the event was made long ago, it probably is no longer active. One other feature on our wish list would be the capability to comment on events. This would encourage user interaction, and the communication will help users to bring their ideas to life.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
