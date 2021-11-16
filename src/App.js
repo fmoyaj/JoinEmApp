@@ -69,11 +69,13 @@ class App extends React.Component{
   }
 
   deleteMember(username){
-    this.setState({members: this.state.members.filter(m => m.username !== username),
+    let eventsPlannedByMember = this.state.events.filter(e => e.planner === username).map(e => e.uid.toString());
+    let filteredMembers = this.state.members.filter(m => m.username !== username);
+    let newMembers = filteredMembers.map(m => {return {...m, coinem: Object.fromEntries(Object.entries(m.coinem).filter(c => !eventsPlannedByMember.includes(c[0].toString())))}});
+    console.log(newMembers);
+    this.setState({members: newMembers,
                   events: this.state.events.filter(e => e.planner !== username), 
                 currentUser: "admin"});
-    
-
   }
 
   deleteEvent(uid){

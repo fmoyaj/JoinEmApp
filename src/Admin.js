@@ -12,6 +12,7 @@ import {RadioGroup, Radio, FormLabel, FormControlLabel, IconButton} from '@mater
 import MUFormControl from '@material-ui/core/FormControl';
 import EditIcon from '@mui/icons-material/Edit';
 import { TryRounded } from '@mui/icons-material';
+import { spacing } from '@mui/system';
 
 
 // 'export' in front of the functions will allow the functions to be imported in other files, like App.js
@@ -206,6 +207,53 @@ export function AddMember(props) {
     );
 }
 
+/* Modal to confirm action of deleting a given element
+    Receives props nameToDelete, which is the name of the type of element
+    that wants to be deleted (e.g. events or members), deleteMethod, which is
+    a method in App to remove the desired element, and elementToDelete, which
+    is the identifier of the element that wants to be deleted (e.g. uid for events
+    and username for members)
+*/ 
+export function ConfirmDelete(props) {
+    const [show, setShow] = useState(false);
+    
+    function handleClose() {
+      setShow(false);
+    }
+
+    function handleConfirm() {
+      setShow(false);
+    }
+
+    const handleOpen = () => setShow(true);
+  
+    return (
+      <>
+        <Container flex>
+            <Button variant="outline-secondary" size="sm" 
+                                style={{ marginLeft: props.margin}}
+                                onClick={() => handleOpen()}>
+                                Delete
+            </Button>
+        </Container>
+        <Modal show={show} onHide={handleClose}>
+          <Modal.Body>
+            Are you sure you would like to delete {props.nameToDelete}? This action cannot be reversed.
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={handleClose}>
+              Cancel
+            </Button>
+            <Button variant="danger" onClick={() => {props.deleteMethod(props.elementToDelete); handleConfirm()}}>
+              Delete
+            </Button>
+          </Modal.Footer>
+        </Modal>
+    </>);
+
+    }
+
+
 
 // Displays all members, including buttons to sort members and to add a new member. 
 // Allows admin to sort by username, number of events planned, number of coinem spent by the member. Admin can also toggle between sorting by ascending or descending order.
@@ -248,6 +296,7 @@ export function Members(props){
         coinem: m.coinem, numOfEvents: numEvents(m), 
         numOfCoinem: numCoinem(m)}});
         sortArray(mappedMembers, sortType);
+        console.log(memberData);
         
     }, [props.data]);
 
@@ -338,9 +387,12 @@ export function Members(props){
                     <td>{props.events.filter(e => e.planner === member.username).map(e => e.uid).join(', ')}</td>
                     <td>{member.numOfCoinem}</td>
                     <td>{Object.entries(member.coinem).map(c => '('+c[0]+','+c[1].toString()+')').join(', ')}</td>
-                    <td><Button variant="outline-secondary" size="sm" onClick={() => props.deleteMember(member.username)}>
-                            Delete
-                        </Button>
+                    <td><ConfirmDelete nameToDelete={`member ${member.username}`} 
+                            deleteMethod={props.deleteMember}
+                            elementToDelete={member.username}
+                            margin={'auto'}
+                        >
+                        </ConfirmDelete>
                     </td>
                     </tr>
                 ))}
@@ -453,13 +505,20 @@ export function Events (props) {
 
             {eventData.map(event => (
                 <div className="card card-spacing">
-                <h5 className="card-header" style={{ display: 'flex'}}>
-                    {event.uid.toString() + ". " + event.title}
-                    <Button variant="outline-secondary" size="sm" 
-                            style={{ marginLeft: "auto" }}
-                            onClick={() => props.deleteEvent(event.uid)}>
-                            Delete
-                    </Button>
+                <h5 className="card-header">
+                    <Row>
+                        <Col md= "9">
+                        {event.uid.toString() + ". " + event.title}
+                        </Col>
+                        <Col md = "3">
+                        <ConfirmDelete nameToDelete={`event ${event.title}`} 
+                                deleteMethod={props.deleteEvent}
+                                elementToDelete={event.uid}
+                                margin={"85%"}
+                            >
+                        </ConfirmDelete>
+                        </Col>
+                    </Row>
                 </h5> 
                 <div className="card-body">
                     <h5 className="card-title">{event.planner}</h5>

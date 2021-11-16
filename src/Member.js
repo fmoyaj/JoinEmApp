@@ -13,10 +13,10 @@ import { Modal } from 'react-bootstrap';
 import { useState, useEffect } from 'react';
 import MaterialButton from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
-import {RadioGroup, Radio, FormLabel, FormControlLabel, Divider} from '@material-ui/core';
+import {RadioGroup, Radio, FormLabel, FormControlLabel} from '@material-ui/core';
 import MUFormControl from '@material-ui/core/FormControl';
-import { lightBlue } from '@material-ui/core/colors';
-import { RowingRounded } from '@mui/icons-material';
+import { ConfirmDelete } from './Admin';
+
 
 // 'export' in front of the functions will allow the functions to be imported in other files, like App.js
 
@@ -169,10 +169,6 @@ export function MemberView(props){
             <td>{props.events.filter(e => e.planner === member.username).map(e => e.uid).join(', ')}</td>
             <td>{member.numOfCoinem}</td>
             <td>{Object.entries(member.coinem).map(c => '('+c[0]+','+c[1].toString()+')').join(', ')}</td>
-            <td><Button variant="outline-secondary" size="sm" onClick={() => props.deleteMember(member.username)}>
-                  Delete
-                </Button>
-            </td>
           </tr>
         ))}
       </tbody>
@@ -322,11 +318,12 @@ export function MemberView(props){
                                 initialUid={props.event.uid} buttonTitle={"Edit"} newEvent={false}></ModifyEvent>
                 </div>
                 <div className="card-deleteButton">
-                  <Button variant="outline-secondary" size="sm" 
-                          style={{ marginLeft: "auto" }}
-                          onClick={() => props.deleteEvent(props.event.uid)}>
-                    Delete
-                    </Button>
+                    <ConfirmDelete nameToDelete={`the event ${props.event.title}`} 
+                                deleteMethod={props.deleteEvent}
+                                elementToDelete={props.event.uid}
+                                margin={"auto"}
+                            >
+                    </ConfirmDelete>
                 </div>
               </Col>
             </Row>
