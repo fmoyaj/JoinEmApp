@@ -2,7 +2,7 @@
 
 Join’em is a React web app where users can organize events and vote for their favorite events that other users have planned. Currently, the Join’em interface supports administrator-only use, and it has two main views: the administrator view and the member view.
 
-Interested in trying the app? Visit: https://fmoyaj.github.io/JoinEmApp/ You can create users and events, as well as become any member using the bar navigation. Do you want to try loading a sample database (JSON file)? Download this sample JSON in this repository and upload it to the app!
+Interested in trying the app? Visit: https://fmoyaj.github.io/JoinEmApp/ You can create users and events, as well as become any member using the bar navigation. Do you want to try loading a sample database (JSON file)? Download [this sample JSON in this repository](https://github.com/fmoyaj/JoinEmApp/tree/master/example_json) and upload it to the app!
 
 ## Navigation
 Join’em has a navigation bar that features a dropdown button to switch between the admin and member views. An admin can become any member by clicking on their username in the dropdown menu. The currently selected user is highlighted in the member list to indicate what user profile (or admin view) is being displayed. 
